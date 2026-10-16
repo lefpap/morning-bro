@@ -35,7 +35,7 @@ No framework, and no Discord bot account. The job runs for seconds a day and onl
 Code is organized **by feature**. Each package owns one capability and exposes a small public API; everything else is package-private.
 
 ```
-morningbot/
+io/github/lefpap/morningbro/
 ├── MorningBro.java            entry point: wiring + daily flow
 ├── config/
 │   ├── AppConfig.java         loads morning-bro.yml + env vars, validates, hands each feature its own part
@@ -45,10 +45,11 @@ morningbot/
 │   └── SendWindow.java        is it time to post?
 ├── weather/
 │   ├── WeatherSettings.java   rain thresholds, emoji per condition
-│   ├── Condition.java         enum: CLEAR, RAIN, SNOW, … plus overrides HOT, FREEZING, UNLIKELY_RAIN
+│   ├── Condition.java         enum: CLEAR, RAIN, SNOW, …, UNLIKELY_RAIN, UNKNOWN
+│   ├── TemperatureAlert.java  enum: HOT, FREEZING
 │   ├── Forecast.java          today's weather code, min/max temp, rain chance
 │   ├── WeatherService.java    forecasts for a list of cities
-│   ├── WeatherEmoji.java      forecast → Condition (rules) → emoji (from settings)
+│   ├── WeatherEmoji.java      forecast → Condition + TemperatureAlert (rules) → emoji (from settings)
 │   └── OpenMeteoClient.java   (package-private) HTTP + response records
 ├── greeting/
 │   ├── GreetingSettings.java  greeting, Friday line, fallback note, home city
@@ -65,7 +66,7 @@ morningbot/
 - **Dependencies point one way:** `greeting → weather`, `discord → greeting`. `weather` and `discord` never know about each other, and nothing depends on `MorningBro`.
 - **The message is platform-neutral.** `greeting` produces a `MorningMessage`; only `discord` knows about embeds, colors, usernames and webhooks. Another platform means a new package next to `discord`.
 - **No global config.** Each feature has a settings record. `AppConfig` builds them, and `MorningBro` passes each feature only its own. Features never read the config file or environment variables directly.
-- **Rules in code, presentation in config.** Which weather codes count as rain, and the override order, are product rules in `WeatherEmoji`. Which emoji represents each `Condition` comes from the config file.
+- **Rules in code, presentation in config.** Which weather codes count as rain, when rain becomes unlikely, and when a temperature alert applies are product rules in `WeatherEmoji`. Which emoji represents each `Condition` and `TemperatureAlert` comes from the config file.
 - **One level deep.** No sub-packages until a feature outgrows a handful of classes.
 - **Product rules live in pure classes** (`SendWindow`, `WeatherEmoji`, `MessageComposer`, `DiscordMapper`), so they're testable without network access.
 
@@ -118,9 +119,10 @@ weather:
     snow: "🌨️"
     thunderstorm: "⛈️"
     unknown: "🌡️"
-    hot: "🥵"                           # high ≥ 35°
-    freezing: "🥶"                      # low ≤ 0°, not snowing
     unlikelyRain: "🌦️"
+  alertEmoji:                           # shown after the condition emoji, never instead of it
+    hot: "🥵"                           # high ≥ 35°
+    freezing: "🥶"                      # low ≤ 0°
 
 discord:
   username: "Morning Bro"
@@ -129,7 +131,7 @@ discord:
   footer: "Forecast by Open-Meteo"
 ```
 
-Validation (at startup, fails the run): every `Condition` has an emoji, `homeCity` is one of `cities`, the hour is 0–23, the timezone is known, coordinates are in range, and there are no unknown keys.
+Validation (at startup, fails the run): every `Condition` and `TemperatureAlert` has an emoji, `homeCity` is one of `cities`, the hour is 0–23, the timezone is known, coordinates are in range, and there are no unknown keys.
 
 Environment variables, for secrets and runtime flags only:
 
@@ -146,7 +148,7 @@ Secrets never go in `morning-bro.yml`.
 
 - **`ci.yml`** runs on every push and PR: `mvn verify`, then a dry run of the built jar with the real `morning-bro.yml`, so a broken config fails CI before it reaches a morning run.
 - **`morning.yml`** runs hourly and on demand: builds with `-DskipTests` and runs the jar. A broken test can't cancel a morning post; CI catches it at push time.
-- Tests mirror the feature packages (`src/test/java/morningbot/<feature>/`) and use a recorded Open-Meteo response; they make no network calls.
+- Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and use a recorded Open-Meteo response; they make no network calls.
 
 ## Constraints
 
