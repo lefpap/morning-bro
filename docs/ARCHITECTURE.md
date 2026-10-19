@@ -38,7 +38,7 @@ Code is organized **by feature**. Each package owns one capability and exposes a
 io/github/lefpap/morningbro/
 ├── MorningBro.java            entry point: wiring + daily flow
 ├── config/
-│   ├── AppConfig.java         loads morning-bro.yml + env vars, validates, hands each feature its own part
+│   ├── AppConfig.java         loads application.yml + env vars, validates, hands each feature its own part
 │   └── City.java              name, flag, latitude, longitude
 ├── schedule/
 │   ├── ScheduleSettings.java  send hour + timezone
@@ -73,7 +73,7 @@ io/github/lefpap/morningbro/
 ## Application flow
 
 1. **Trigger.** GitHub Actions runs the job hourly at minute :07, or manually (which sets `FORCE=true`).
-2. **Load config.** `AppConfig` reads `morning-bro.yml` and the env vars, and validates them. A missing file, unknown key, or invalid value fails the run.
+2. **Load config.** `AppConfig` reads `application.yml` and the env vars, and validates them. A missing file, unknown key, or invalid value fails the run.
 3. **Time gate.** `SendWindow` checks whether it's the configured hour in the configured timezone. If not, and the run isn't forced, the app exits with success.
 4. **Fetch.** `WeatherService` gets today's forecast for all cities in one request and maps it to `Forecast` records. Unexpected or partial data is an error.
 5. **Compose.** `MessageComposer` builds the `MorningMessage`: greeting, Friday line on Fridays, and one line per city.
@@ -87,7 +87,7 @@ GitHub Actions cron runs in UTC only. The workflow therefore runs **every hour**
 
 ## Configuration
 
-All non-secret settings live in **`morning-bro.yml`** at the repository root. Changing a text, emoji, city, or the send time is an edit and a commit, with no code change. The file is read at runtime, not bundled into the jar. `CONFIG_PATH` can point to a different file.
+All non-secret settings live in **`application.yml`** at the repository root. Changing a text, emoji, city, or the send time is an edit and a commit, with no code change. The file is read at runtime, not bundled into the jar. `CONFIG_PATH` can point to a different file.
 
 ```yaml
 schedule:
@@ -101,17 +101,17 @@ cities:
 
 greeting:
   text: "Good Morning — Καλημέρα! ☕"
-  homeCity: Athens                      # its weather emoji is appended to the greeting
+  home-city: Athens                     # its weather emoji is appended to the greeting
   friday: "Take it easy Friday! 😎"
   fallback: "(weather is taking the day off)"
 
 weather:
-  likelyRainPercent: 40                 # below this, rain/storm shows as unlikelyRain
-  showRainPercent: 20                   # at or above this, "☔ NN%" is shown
+  likely-rain-percent: 40               # below this, rain/storm shows as unlikely-rain
+  show-rain-percent: 20                 # at or above this, "☔ NN%" is shown
   emoji:
     clear: "☀️"
-    mostlyClear: "🌤️"
-    partlyCloudy: "⛅"
+    mostly-clear: "🌤️"
+    partly-cloudy: "⛅"
     overcast: "☁️"
     fog: "🌫️"
     drizzle: "🌦️"
@@ -119,34 +119,34 @@ weather:
     snow: "🌨️"
     thunderstorm: "⛈️"
     unknown: "🌡️"
-    unlikelyRain: "🌦️"
-  alertEmoji:                           # shown after the condition emoji, never instead of it
+    unlikely-rain: "🌦️"
+  alert-emoji:                          # shown after the condition emoji, never instead of it
     hot: "🥵"                           # high ≥ 35°
     freezing: "🥶"                      # low ≤ 0°
 
 discord:
   username: "Morning Bro"
-  avatarUrl: null
+  avatar-url: null
   color: "#6F4E37"
   footer: "Forecast by Open-Meteo"
 ```
 
-Validation (at startup, fails the run): every `Condition` and `TemperatureAlert` has an emoji, `homeCity` is one of `cities`, the hour is 0–23, the timezone is known, coordinates are in range, and there are no unknown keys.
+Validation (at startup, fails the run): every `Condition` and `TemperatureAlert` has an emoji, `home-city` is one of `cities`, the hour is 0–23, the timezone is known, coordinates are in range, and there are no unknown keys.
 
 Environment variables, for secrets and runtime flags only:
 
 | Variable | Source | Default |
 |---|---|---|
 | `DISCORD_WEBHOOK_URL` | GitHub secret | required unless `DRY_RUN` |
-| `CONFIG_PATH` | env var | `morning-bro.yml` |
+| `CONFIG_PATH` | env var | `application.yml` |
 | `FORCE` | set by the workflow on manual runs | `false` |
 | `DRY_RUN` | env var | `false` |
 
-Secrets never go in `morning-bro.yml`.
+Secrets never go in `application.yml`.
 
 ## Build and CI
 
-- **`ci.yml`** runs on every push and PR: `mvn verify`, then a dry run of the built jar with the real `morning-bro.yml`, so a broken config fails CI before it reaches a morning run.
+- **`ci.yml`** runs on every push and PR: `mvn verify`, then a dry run of the built jar with the real `application.yml`, so a broken config fails CI before it reaches a morning run.
 - **`morning.yml`** runs hourly and on demand: builds with `-DskipTests` and runs the jar. A broken test can't cancel a morning post; CI catches it at push time.
 - Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and use a recorded Open-Meteo response; they make no network calls.
 
