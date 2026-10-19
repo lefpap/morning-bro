@@ -315,7 +315,8 @@ class SettingsTest {
     private static String readTestSettingsFile() {
         try (InputStream in = SettingsTest.class.getResourceAsStream("/application-test.yml")) {
             assertThat(in).isNotNull();
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            // Git may check the file out with \r\n line endings; the tests edit its text line by line.
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8).replace("\r\n", "\n");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
