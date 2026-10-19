@@ -1,0 +1,39 @@
+schedule:
+  hour: 8
+  timezone: Europe/Athens
+
+cities:
+  - { name: Athens,   flag: "🇬🇷", lat: 37.98, lon: 23.73 }
+  - { name: Brussels, flag: "🇧🇪", lat: 50.85, lon: 4.35 }
+  - { name: Milan,    flag: "🇮🇹", lat: 45.46, lon: 9.19 }
+
+greeting:
+  text: "Good Morning — Καλημέρα! ☕"
+  home-city: Athens                     # its weather emoji is appended to the greeting
+  friday: "Take it easy Friday! 😎"
+  fallback: "(weather is taking the day off)"
+
+weather:
+  likely-rain-percent: 40               # below this, rain/storm shows as unlikely-rain
+  show-rain-percent: 20                 # at or above this, "☔ NN%" is shown
+  emoji:
+    clear: "☀️"
+    mostly-clear: "🌤️"
+    partly-cloudy: "⛅"
+    overcast: "☁️"
+    fog: "🌫️"
+    drizzle: "🌦️"
+    rain: "🌧️"
+    snow: "🌨️"
+    thunderstorm: "⛈️"
+    unknown: "🌡️"
+    unlikely-rain: "🌦️"
+  alert-emoji:                          # shown after the condition emoji, never instead of it
+    hot: "🥵"                           # high ≥ 35°
+    freezing: "🥶"                      # low ≤ 0°
+
+discord:
+  username: "Morning Bro"
+  avatar-url: null
+  color: "#6F4E37"
+  footer: "Forecast by Open-Meteo"

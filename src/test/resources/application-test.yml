@@ -1,0 +1,38 @@
+schedule:
+  hour: 8
+  timezone: Europe/Athens
+
+cities:
+  - { name: Athens,   flag: "🇬🇷", lat: 37.98, lon: 23.73 }
+  - { name: Brussels, flag: "🇧🇪", lat: 50.85, lon: 4.35 }
+
+greeting:
+  text: "Good Morning ☕"
+  home-city: Athens
+  friday: "Take it easy Friday! 😎"
+  fallback: "(weather is taking the day off)"
+
+weather:
+  likely-rain-percent: 40
+  show-rain-percent: 20
+  emoji:
+    clear: "☀️"
+    mostly-clear: "🌤️"
+    partly-cloudy: "⛅"
+    overcast: "☁️"
+    fog: "🌫️"
+    drizzle: "🌦️"
+    rain: "🌧️"
+    snow: "🌨️"
+    thunderstorm: "⛈️"
+    unknown: "🌡️"
+    unlikely-rain: "🌦️"
+  alert-emoji:
+    hot: "🥵"
+    freezing: "🥶"
+
+discord:
+  username: "Morning Bro"
+  avatar-url: null
+  color: "#6F4E37"
+  footer: "Forecast by Open-Meteo"
