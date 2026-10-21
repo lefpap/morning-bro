@@ -150,11 +150,13 @@ Secrets never go in `application.yml`.
 
 - **`ci.yml`** runs on every push and PR: `mvn verify`, then a dry run of the built jar with the real `application.yml`, so a broken config fails CI before it reaches a morning run.
 - **`morning.yml`** runs hourly and on demand: builds with `-DskipTests` and runs the jar. A broken test can't cancel a morning post; CI catches it at push time.
-- Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and use a recorded Open-Meteo response; they make no network calls.
+- Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and make no network calls.
+  - `OpenMeteoClientTest` runs the real client against a local `HttpServer` that serves responses recorded from Open-Meteo, in `src/test/resources/open-meteo/`. Each file in `broken/` is `athens.json` with one value changed.
+  - `WeatherServiceTest` mocks `OpenMeteoClient` with Mockito. Mockito is loaded as a `-javaagent` through surefire's `argLine`, so running tests from an IDE may need that agent added to the run configuration.
 
 ## Constraints
 
 - GitHub cron is best-effort. Runs can start minutes late and are occasionally skipped.
 - Scheduled workflows are paused in public repositories after 60 days without commits.
 - Open-Meteo's free tier is non-commercial and requires attribution, shown in the message footer.
-- Open-Meteo's daily weather code is the day's *worst* condition, which is why the emoji rules use rain probability to soften it.
+- Open-Meteo's daily weather code is the day's *worst* condition, which is why the emoji rules use the Rain Chance to soften it.
