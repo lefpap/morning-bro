@@ -23,7 +23,7 @@ flowchart LR
 | JSON | Jackson (`jackson-databind`), mapping to records |
 | Config file | YAML via Jackson (`jackson-dataformat-yaml`), mapped to the same settings records |
 | HTTP | `java.net.http.HttpClient` (JDK) |
-| Tests | JUnit 5 |
+| Tests | JUnit 5, AssertJ, Mockito (forecast source only) |
 | Scheduling, secrets | GitHub Actions |
 | Weather data | Open-Meteo (free, no API key, one request for all cities) |
 | Delivery | Discord channel webhook (send-only) |
@@ -38,19 +38,20 @@ Code is organized **by feature**. Each package owns one capability and exposes a
 io/github/lefpap/morningbro/
 ├── MorningBro.java            entry point: wiring + daily flow
 ├── settings/
-│   ├── Settings.java          loads application.yml + env vars, validates, hands each feature its own part
-│   └── City.java              name, flag, latitude, longitude
+│   └── Settings.java          loads application.yml + env vars, validates, hands each feature its own part
 ├── schedule/
 │   ├── ScheduleSettings.java  send hour + timezone
 │   └── SendWindow.java        is it time to post?
 ├── weather/
+│   ├── City.java              name, flag, latitude, longitude
 │   ├── WeatherSettings.java   rain thresholds, emoji per condition
 │   ├── Condition.java         enum: CLEAR, RAIN, SNOW, …, UNLIKELY_RAIN, UNKNOWN
 │   ├── TemperatureAlert.java  enum: HOT, FREEZING
-│   ├── Forecast.java          today's weather code, min/max temp, rain chance
-│   ├── WeatherService.java    forecasts for a list of cities
-│   ├── WeatherEmoji.java      forecast → Condition + TemperatureAlert (rules) → emoji (from settings)
-│   └── OpenMeteoClient.java   (package-private) HTTP + response records
+│   ├── Forecast.java          day, weather code, min/max temp, rain chance
+│   ├── WeatherService.java    one Forecast per city for the Forecast Day; rejects partial or unexpected forecasts
+│   ├── OpenMeteoClient.java   the only class that knows Open-Meteo: HTTP + response records
+│   ├── WeatherException.java  the forecast couldn't be fetched, or came back partial or unexpected
+│   └── WeatherEmoji.java      forecast → Condition + TemperatureAlert (rules) → emoji (from settings)
 ├── greeting/
 │   ├── GreetingSettings.java  greeting, Friday line, fallback note, home city
 │   ├── MorningMessage.java    platform-neutral message: greeting lines + city lines
@@ -67,6 +68,7 @@ io/github/lefpap/morningbro/
 - **The message is platform-neutral.** `greeting` produces a `MorningMessage`; only `discord` knows about embeds, colors, usernames and webhooks. Another platform means a new package next to `discord`.
 - **No global settings object.** Each feature has a settings record. `Settings` builds them, and `MorningBro` passes each feature only its own. Features never read the Settings File or environment variables directly.
 - **Rules in code, presentation in config.** Which weather codes count as rain, when rain becomes unlikely, and when a temperature alert applies are product rules in `WeatherEmoji`. Which emoji represents each `Condition` and `TemperatureAlert` comes from the config file.
+- **The entry point picks the forecast source.** `MorningBro` wires `new WeatherService(new OpenMeteoClient())`; everything else uses `WeatherService` and never names the source.
 - **One level deep.** No sub-packages until a feature outgrows a handful of classes.
 - **Product rules live in pure classes** (`SendWindow`, `WeatherEmoji`, `MessageComposer`, `DiscordMapper`), so they're testable without network access.
 
@@ -75,7 +77,7 @@ io/github/lefpap/morningbro/
 1. **Trigger.** GitHub Actions runs the job hourly at minute :07, or manually (which sets `FORCE=true`).
 2. **Load settings.** `Settings` reads `application.yml` and the env vars, and validates them. A missing file, unknown key, or invalid value fails the run.
 3. **Time gate.** `SendWindow` checks whether it's the configured hour in the configured timezone. If not, and the run isn't forced, the app exits with success.
-4. **Fetch.** `WeatherService` gets today's forecast for all cities in one request and maps it to `Forecast` records. Unexpected or partial data is an error.
+4. **Fetch.** `WeatherService` gets the Forecast Day for all cities in one request through `OpenMeteoClient`, which maps the response to `Forecast` records. `WeatherService` checks there is one per city, each for the Forecast Day. Unexpected or partial data is an error.
 5. **Compose.** `MessageComposer` builds the `MorningMessage`: greeting, Friday line on Fridays, and one line per city.
 6. **Fallback.** If step 4 or 5 fails, `composeFallback` produces the greeting plus the fallback note, with no city lines.
 7. **Publish.** `DiscordPublisher` maps the message to a webhook payload and POSTs it. With `DRY_RUN=true`, the payload is printed instead.
@@ -148,11 +150,13 @@ Secrets never go in `application.yml`.
 
 - **`ci.yml`** runs on every push and PR: `mvn verify`, then a dry run of the built jar with the real `application.yml`, so a broken config fails CI before it reaches a morning run.
 - **`morning.yml`** runs hourly and on demand: builds with `-DskipTests` and runs the jar. A broken test can't cancel a morning post; CI catches it at push time.
-- Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and use a recorded Open-Meteo response; they make no network calls.
+- Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and make no network calls.
+  - `OpenMeteoClientTest` runs the real client against a local `HttpServer` that serves responses recorded from Open-Meteo, in `src/test/resources/open-meteo/`. Each file in `broken/` is `athens.json` with one value changed.
+  - `WeatherServiceTest` mocks `OpenMeteoClient` with Mockito. Mockito is loaded as a `-javaagent` through surefire's `argLine`, so running tests from an IDE may need that agent added to the run configuration.
 
 ## Constraints
 
 - GitHub cron is best-effort. Runs can start minutes late and are occasionally skipped.
 - Scheduled workflows are paused in public repositories after 60 days without commits.
 - Open-Meteo's free tier is non-commercial and requires attribution, shown in the message footer.
-- Open-Meteo's daily weather code is the day's *worst* condition, which is why the emoji rules use rain probability to soften it.
+- Open-Meteo's daily weather code is the day's *worst* condition, which is why the emoji rules use the Rain Chance to soften it.

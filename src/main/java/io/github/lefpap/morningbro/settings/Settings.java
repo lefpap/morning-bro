@@ -3,6 +3,7 @@ package io.github.lefpap.morningbro.settings;
 import io.github.lefpap.morningbro.discord.DiscordSettings;
 import io.github.lefpap.morningbro.greeting.GreetingSettings;
 import io.github.lefpap.morningbro.schedule.ScheduleSettings;
+import io.github.lefpap.morningbro.weather.City;
 import io.github.lefpap.morningbro.weather.Condition;
 import io.github.lefpap.morningbro.weather.TemperatureAlert;
 import io.github.lefpap.morningbro.weather.WeatherSettings;

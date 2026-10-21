@@ -1,5 +1,7 @@
 package io.github.lefpap.morningbro.settings;
 
+import io.github.lefpap.morningbro.weather.City;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

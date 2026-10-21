@@ -1,5 +1,6 @@
 package io.github.lefpap.morningbro.settings;
 
+import io.github.lefpap.morningbro.weather.City;
 import io.github.lefpap.morningbro.weather.Condition;
 import io.github.lefpap.morningbro.weather.TemperatureAlert;
 import org.assertj.core.api.AbstractThrowableAssert;

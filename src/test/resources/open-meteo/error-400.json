@@ -1,0 +1,4 @@
+{
+  "reason": "Invalid value: Cannot initialize ForecastVariableDaily from invalid String value nonsense",
+  "error": true
+}
