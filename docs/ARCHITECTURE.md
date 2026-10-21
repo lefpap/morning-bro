@@ -38,12 +38,12 @@ Code is organized **by feature**. Each package owns one capability and exposes a
 io/github/lefpap/morningbro/
 ├── MorningBro.java            entry point: wiring + daily flow
 ├── settings/
-│   ├── Settings.java          loads application.yml + env vars, validates, hands each feature its own part
-│   └── City.java              name, flag, latitude, longitude
+│   └── Settings.java          loads application.yml + env vars, validates, hands each feature its own part
 ├── schedule/
 │   ├── ScheduleSettings.java  send hour + timezone
 │   └── SendWindow.java        is it time to post?
 ├── weather/
+│   ├── City.java              name, flag, latitude, longitude
 │   ├── WeatherSettings.java   rain thresholds, emoji per condition
 │   ├── Condition.java         enum: CLEAR, RAIN, SNOW, …, UNLIKELY_RAIN, UNKNOWN
 │   ├── TemperatureAlert.java  enum: HOT, FREEZING
