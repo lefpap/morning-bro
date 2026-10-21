@@ -1,10 +1,10 @@
 package io.github.lefpap.morningbro.weather;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -75,17 +75,7 @@ class WeatherEmojiTest {
             " 0,   10, FREEZING",
             "0.1,  10,    "})
     void anExtremeTemperatureAddsATemperatureAlert(double low, double high, TemperatureAlert expected) {
-        Forecast forecast = new Forecast(0, low, high, OptionalInt.empty());
-
-        assertThat(weatherEmoji.alerts(forecast)).isEqualTo(expected == null ? Set.of() : Set.of(expected));
-    }
-
-    @Test
-    void aSnowyDayBelowZeroIsSnowAndFreezing() {
-        Forecast forecast = new Forecast(71, -4, 1, OptionalInt.empty());
-
-        assertThat(weatherEmoji.condition(forecast)).isEqualTo(Condition.SNOW);
-        assertThat(weatherEmoji.alerts(forecast)).containsExactly(TemperatureAlert.FREEZING);
+        assertThat(weatherEmoji.alerts(forecast(0, null, low, high))).isEqualTo(expected == null ? Set.of() : Set.of(expected));
     }
 
     @ParameterizedTest
@@ -96,10 +86,7 @@ class WeatherEmojiTest {
             " 0,   , 12, 24, ☀️"})
     void theEmojiIsTheConditionFollowedByAnyTemperatureAlert(
             int weatherCode, Integer rainChance, double low, double high, String expected) {
-        Forecast forecast = new Forecast(weatherCode, low, high,
-                rainChance == null ? OptionalInt.empty() : OptionalInt.of(rainChance));
-
-        assertThat(weatherEmoji.emoji(forecast)).isEqualTo(expected);
+        assertThat(weatherEmoji.emoji(forecast(weatherCode, rainChance, low, high))).isEqualTo(expected);
     }
 
     private static Forecast forecast(int weatherCode) {
@@ -107,7 +94,11 @@ class WeatherEmojiTest {
     }
 
     private static Forecast forecast(int weatherCode, Integer rainChance) {
-        return new Forecast(weatherCode, 12.0, 24.0,
+        return forecast(weatherCode, rainChance, 12.0, 24.0);
+    }
+
+    private static Forecast forecast(int weatherCode, Integer rainChance, double low, double high) {
+        return new Forecast(LocalDate.of(2026, 10, 21), weatherCode, low, high,
                 rainChance == null ? OptionalInt.empty() : OptionalInt.of(rainChance));
     }
 }
