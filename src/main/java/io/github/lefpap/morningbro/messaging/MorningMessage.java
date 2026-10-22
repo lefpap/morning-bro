@@ -17,17 +17,17 @@ public sealed interface MorningMessage {
 
     /**
      * @param homeWeather the Home City's Condition emoji and any Temperature Alert, which end the Greeting Line
-     * @param attribution the credit to the forecast source, shown with the Weather Card
+     * @param attribution the credit to the forecast source, shown with the Weather Report
      */
     record WithWeather(
         String greeting,
         String homeWeather,
         Optional<String> fridayLine,
-        List<CityForecast> weatherCard,
+        List<CityForecast> weatherReport,
         String attribution) implements MorningMessage {
     }
 
-    /** The message when the weather is unavailable: no Home City weather and no Weather Card. */
+    /** The message when the weather is unavailable: no Home City weather and no Weather Report. */
     record Fallback(String greeting, Optional<String> fridayLine, String fallbackNote) implements MorningMessage {
     }
 }

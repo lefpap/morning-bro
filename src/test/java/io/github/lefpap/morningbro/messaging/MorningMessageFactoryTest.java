@@ -71,18 +71,18 @@ class MorningMessageFactoryTest {
     }
 
     @Test
-    void theWeatherCardHasOneCityForecastPerCityWithTemperaturesRoundedToWholeDegrees() {
+    void theWeatherReportHasOneCityForecastPerCityWithTemperaturesRoundedToWholeDegrees() {
         MorningMessage.WithWeather message = withWeather(factory.create(forecasts(
                 ATHENS, forecast(WEDNESDAY, 0, 17.4, 26.6, 0),
                 BRUSSELS, forecast(WEDNESDAY, 71, -4.4, 0.5, 0)), WEDNESDAY));
 
-        assertThat(message.weatherCard()).containsExactly(
+        assertThat(message.weatherReport()).containsExactly(
                 new CityForecast(ATHENS, "☀️", 17, 27, OptionalInt.empty()),
                 new CityForecast(BRUSSELS, "🌨️🥶", -4, 1, OptionalInt.empty()));
     }
 
     @Test
-    void theWeatherCardCarriesTheAttribution() {
+    void theWeatherReportCarriesTheAttribution() {
         MorningMessage.WithWeather message = withWeather(factory.create(dryDay(WEDNESDAY), WEDNESDAY));
 
         assertThat(message.attribution()).isEqualTo("Forecast by Open-Meteo");
@@ -99,7 +99,7 @@ class MorningMessageFactoryTest {
                 ATHENS, forecast(WEDNESDAY, 0, 12, 24, 0),
                 BRUSSELS, forecast(WEDNESDAY, 51, 9, 14, rainChance)), WEDNESDAY));
 
-        assertThat(message.weatherCard()).last().extracting(CityForecast::rainChance)
+        assertThat(message.weatherReport()).last().extracting(CityForecast::rainChance)
                 .isEqualTo(optional(expected));
     }
 
@@ -112,7 +112,7 @@ class MorningMessageFactoryTest {
     }
 
     @Test
-    void whenTheHomeCityHasNoForecastTheFallbackMessageGoesOutInsteadOfAPartialWeatherCard() {
+    void whenTheHomeCityHasNoForecastTheFallbackMessageGoesOutInsteadOfAPartialWeatherReport() {
         Map<City, Forecast> brusselsOnly = Map.of(BRUSSELS, forecast(WEDNESDAY, 0, 12, 24, 0));
 
         MorningMessage message = factory.create(brusselsOnly, WEDNESDAY);
@@ -131,7 +131,7 @@ class MorningMessageFactoryTest {
         return assertThat(message).asInstanceOf(type(MorningMessage.WithWeather.class)).actual();
     }
 
-    /** Ordered, since the Weather Card follows the order of the cities. */
+    /** Ordered, since the Weather Report follows the order of the cities. */
     private static Map<City, Forecast> forecasts(City city, Forecast forecast, City other, Forecast otherForecast) {
         Map<City, Forecast> forecasts = new LinkedHashMap<>();
         forecasts.put(city, forecast);

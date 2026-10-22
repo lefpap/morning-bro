@@ -23,11 +23,11 @@ public class DiscordMessageComposer {
         List<String> lines = new ArrayList<>();
         switch (message) {
             case MorningMessage.WithWeather(
-                var greeting, var homeWeather, var fridayLine, var weatherCard, var attribution) -> {
+                var greeting, var homeWeather, var fridayLine, var weatherReport, var attribution) -> {
                 lines.add(greeting + homeWeather);
                 fridayLine.ifPresent(lines::add);
                 lines.add("");
-                weatherCard.forEach(cityForecast -> lines.add(line(cityForecast)));
+                weatherReport.forEach(cityForecast -> lines.add(line(cityForecast)));
                 lines.add("-# " + attribution);
             }
             case MorningMessage.Fallback(var greeting, var fridayLine, var fallbackNote) -> {

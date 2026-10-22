@@ -40,11 +40,11 @@ public class MorningMessageFactory {
     }
 
     private MorningMessage withWeather(Map<City, Forecast> forecastsByCity, Forecast home, Optional<String> fridayLine) {
-        List<CityForecast> weatherCard = forecastsByCity.entrySet().stream()
+        List<CityForecast> weatherReport = forecastsByCity.entrySet().stream()
             .map(entry -> cityForecast(entry.getKey(), entry.getValue()))
             .toList();
         return new MorningMessage.WithWeather(
-            greeting.text(), weatherEmoji.emoji(home), fridayLine, weatherCard, attribution);
+            greeting.text(), weatherEmoji.emoji(home), fridayLine, weatherReport, attribution);
     }
 
     private Optional<Forecast> homeForecast(Map<City, Forecast> forecastsByCity) {

@@ -55,8 +55,8 @@ io/github/lefpap/morningbro/
 ├── messaging/
 │   ├── GreetingSettings.java  greeting, Friday line, fallback note, home city
 │   ├── MorningMessage.java    sealed, platform-neutral data: WithWeather (Greeting, Home City emoji, Friday Line,
-│   │                          Weather Card, Attribution) or Fallback (Greeting, Friday Line, Fallback Note); nothing formatted
-│   ├── CityForecast.java      one city's entry in the Weather Card: city, emoji, rounded low/high, Rain Chance to show
+│   │                          Weather Report, Attribution) or Fallback (Greeting, Friday Line, Fallback Note); nothing formatted
+│   ├── CityForecast.java      one city's entry in the Weather Report: city, emoji, rounded low/high, Rain Chance to show
 │   ├── MorningMessageFactory.java  the product rules: forecasts → MorningMessage, or the Fallback Message
 │   │                          when there's no forecast for the Home City (an empty map means the weather is unavailable)
 │   ├── MessagePublisher.java  interface: delivers a MorningMessage on one platform
@@ -88,7 +88,7 @@ io/github/lefpap/morningbro/
 2. **Load settings.** `Settings` reads `application.yml` and the env vars, and validates them. A missing file, unknown key, or invalid value fails the run.
 3. **Time gate.** `SendWindow` checks whether it's the configured hour in the configured timezone. If not, and the run isn't forced, the app exits with success.
 4. **Fetch.** `WeatherService` gets the Forecast Day for all cities in one request through `OpenMeteoClient`, which maps the response to `Forecast` records. `WeatherService` checks there is one per city, each for the Forecast Day. Unexpected or partial data is a `WeatherException`: `MorningBro` logs why the weather is unavailable and carries on with no forecasts (an empty map).
-5. **Build the message.** `MorningMessageFactory` builds the `MorningMessage`: the greeting with the Home City's emoji, the Friday Line on Fridays, and one City Forecast per city. With no forecast for the Home City, which includes no forecasts at all, it builds the Fallback Message instead: the greeting text, the Friday Line on Fridays, and the Fallback Note, with no Weather Card. It never builds a partly filled Weather Card.
+5. **Build the message.** `MorningMessageFactory` builds the `MorningMessage`: the greeting with the Home City's emoji, the Friday Line on Fridays, and one City Forecast per city. With no forecast for the Home City, which includes no forecasts at all, it builds the Fallback Message instead: the greeting text, the Friday Line on Fridays, and the Fallback Note, with no Weather Report. It never builds a partly filled Weather Report.
 6. **Show it in the run log.** `ConsoleMessagePublisher` prints the message as plain text, so the Owner can check it.
 7. **Publish.** `DiscordMessagePublisher` turns the message into a webhook payload and POSTs it. With `DRY_RUN=true`, the payload is printed instead. A failed or rejected post is a `DiscordException`, and `MorningBro` exits non-zero.
 8. **Report.** A failed post or invalid config exits non-zero. The workflow run fails, and GitHub notifies the owner. An unavailable weather does not: the Fallback Message still goes out.
@@ -170,5 +170,5 @@ Secrets never go in `application.yml`.
 
 - GitHub cron is best-effort. Runs can start minutes late and are occasionally skipped.
 - Scheduled workflows are paused in public repositories after 60 days without commits.
-- Open-Meteo's free tier is non-commercial and requires attribution, shown as small text below the Weather Card.
+- Open-Meteo's free tier is non-commercial and requires attribution, shown as small text below the Weather Report.
 - Open-Meteo's daily weather code is the day's *worst* condition, which is why the emoji rules use the Rain Chance to soften it.

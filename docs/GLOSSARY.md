@@ -5,7 +5,7 @@ A daily good-morning ritual for one Discord community spread across cities: a gr
 ## The message
 
 **Morning Message**:
-The single post Morning Bro makes to the Channel: a Greeting Line, a Friday Line on Fridays, and a Weather Card.
+The single post Morning Bro makes to the Channel: a Greeting Line, a Friday Line on Fridays, and a Weather Report.
 _Avoid_: post (as a noun), greeting, bot message
 
 **Greeting Line**:
@@ -15,20 +15,20 @@ _Avoid_: greeting (for the whole message), header
 **Friday Line**:
 The extra line that follows the Greeting Line on Fridays only.
 
-**Weather Card**:
+**Weather Report**:
 The block below the greeting lines that holds one City Forecast per city.
-_Avoid_: embed, city lines
+_Avoid_: card, embed, city lines
 
 **City Forecast**:
-One city's entry in the Weather Card: flag, name, Condition emoji, any Temperature Alert, low and high temperature, and Rain Chance when it's worth showing.
+One city's entry in the Weather Report: flag, name, Condition emoji, any Temperature Alert, low and high temperature, and Rain Chance when it's worth showing.
 _Avoid_: city line, entry, tile
 
 **Attribution**:
-The credit to the forecast source shown on the Weather Card, as the source's terms require.
+The credit to the forecast source shown on the Weather Report, as the source's terms require.
 _Avoid_: footer
 
 **Fallback Message**:
-The Morning Message posted when the weather is unavailable: no Weather Card, no Home City emoji, and the Fallback Note instead.
+The Morning Message posted when the weather is unavailable: no Weather Report, no Home City emoji, and the Fallback Note instead.
 
 **Fallback Note**:
 The light-hearted line in a Fallback Message saying the weather couldn't be fetched.

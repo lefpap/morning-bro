@@ -26,7 +26,7 @@ Each message has up to three parts:
 
 2. **The Friday line**: on **Fridays** only, a second line: *"Take it easy Friday! 😎"*
 
-3. **The weather card**: a compact, always-visible block below the greeting, with one entry per city, each on its own line. Each entry shows:
+3. **The weather report**: a compact list below the greeting, one line per city. Each line shows:
    - the city's flag and name
    - one emoji summarizing the day's weather, followed by a temperature alert on very hot or freezing days
    - the day's low and high temperature, rounded to whole degrees Celsius
@@ -82,11 +82,11 @@ Examples: Athens, clear, 24–37° → `☀️🥵 24–37°`. Milan, snowing, -
 - If the forecast doesn't include a rain chance, nothing is shown, and the emoji follows the forecast as-is.
 
 ### Attribution
-The weather card credits its forecast source, as the source's terms require.
+The weather report credits its forecast source, as the source's terms require.
 
 ## When things go wrong
 
-- **Weather unavailable:** the greeting still goes out, without the weather emoji, including the Friday line, with a light-hearted note: *"(weather is taking the day off)"*. There is no weather card. The ritual never skips because of the weather.
+- **Weather unavailable:** the greeting still goes out, without the weather emoji, including the Friday line, with a light-hearted note: *"(weather is taking the day off)"*. There is no weather report. The ritual never skips because of the weather.
 - **Posting fails:** the owner is notified, so a silent outage doesn't go unnoticed.
 - **Partial or unexpected weather data:** treated as "weather unavailable". A message that is wrong or half-filled is never posted.
 
