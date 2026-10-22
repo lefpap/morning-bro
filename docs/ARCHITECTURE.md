@@ -163,6 +163,7 @@ Secrets never go in `application.yml`.
   - `OpenMeteoClientTest` runs the real client against a local `HttpServer` that serves responses recorded from Open-Meteo, in `src/test/resources/open-meteo/`. Each file in `broken/` is `athens.json` with one value changed.
   - `WeatherServiceTest` mocks `OpenMeteoClient` with Mockito. Mockito is loaded as a `-javaagent` through surefire's `argLine`, so running tests from an IDE may need that agent added to the run configuration.
   - `DiscordMessagePublisherTest` runs the real publisher against a local `HttpServer` standing in for the webhook.
+  - `SendWindowTest` passes fixed instants instead of reading the clock, including both daylight-saving changes in the Reference Timezone.
   - `MorningMessageFactoryTest` builds `Forecast`s by hand, and each composer's test builds `MorningMessage`s by hand, so neither needs a mock.
   - `MorningBro` and `ConsoleMessagePublisher` have no unit tests: one only wires features together, the other only prints `ConsoleMessageComposer`'s text. CI's dry run of the built jar covers them.
 
