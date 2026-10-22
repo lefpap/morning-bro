@@ -3,6 +3,9 @@ import io.github.lefpap.morningbro.messaging.MorningMessage;
 import io.github.lefpap.morningbro.messaging.MorningMessageFactory;
 import io.github.lefpap.morningbro.messaging.console.ConsoleMessageComposer;
 import io.github.lefpap.morningbro.messaging.console.ConsoleMessagePublisher;
+import io.github.lefpap.morningbro.messaging.discord.DiscordMessageComposer;
+import io.github.lefpap.morningbro.messaging.discord.DiscordException;
+import io.github.lefpap.morningbro.messaging.discord.DiscordMessagePublisher;
 import io.github.lefpap.morningbro.settings.Settings;
 import io.github.lefpap.morningbro.settings.SettingsException;
 import io.github.lefpap.morningbro.weather.*;
@@ -13,6 +16,8 @@ void main() {
         run(settings);
     } catch (SettingsException e) {
         exit(e.getMessage());
+    } catch (DiscordException e) {
+        exit("The Morning Message wasn't posted: " + e.getMessage());
     }
 }
 
@@ -20,7 +25,9 @@ void run(Settings settings) {
     OpenMeteoClient openMeteoClient = new OpenMeteoClient();
     WeatherService weatherService = new WeatherService(openMeteoClient);
     MorningMessageFactory messageFactory = new MorningMessageFactory(settings.greeting(), settings.weather());
-    MessagePublisher messagePublisher = new ConsoleMessagePublisher(new ConsoleMessageComposer());
+    MessagePublisher consolePublisher = new ConsoleMessagePublisher(new ConsoleMessageComposer());
+    MessagePublisher discordPublisher =
+        new DiscordMessagePublisher(new DiscordMessageComposer(settings.discord()), settings.discord(), settings.dryRun());
 
     IO.println(settings.summary());
 
@@ -29,7 +36,9 @@ void run(Settings settings) {
     Map<City, Forecast> forecastsByCity = fetchForecastsByCity(weatherService, settings.cities(), forecastDay);
     MorningMessage message = messageFactory.create(forecastsByCity, forecastDay);
     IO.println();
-    messagePublisher.publish(message);
+    consolePublisher.publish(message);
+    IO.println();
+    discordPublisher.publish(message);
 }
 
 /**

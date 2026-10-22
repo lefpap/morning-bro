@@ -44,7 +44,7 @@ io/github/lefpap/morningbro/
 │   └── SendWindow.java        is it time to post?
 ├── weather/
 │   ├── City.java              name, flag, latitude, longitude
-│   ├── WeatherSettings.java   rain thresholds, emoji per condition
+│   ├── WeatherSettings.java   rain thresholds, emoji per condition, the Attribution
 │   ├── Condition.java         enum: CLEAR, RAIN, SNOW, …, UNLIKELY_RAIN, UNKNOWN
 │   ├── TemperatureAlert.java  enum: HOT, FREEZING
 │   ├── Forecast.java          day, weather code, min/max temp, rain chance
@@ -55,18 +55,20 @@ io/github/lefpap/morningbro/
 ├── messaging/
 │   ├── GreetingSettings.java  greeting, Friday line, fallback note, home city
 │   ├── MorningMessage.java    sealed, platform-neutral data: WithWeather (Greeting, Home City emoji, Friday Line,
-│   │                          Weather Card) or Fallback (Greeting, Friday Line, Fallback Note); nothing formatted
+│   │                          Weather Card, Attribution) or Fallback (Greeting, Friday Line, Fallback Note); nothing formatted
 │   ├── CityForecast.java      one city's entry in the Weather Card: city, emoji, rounded low/high, Rain Chance to show
 │   ├── MorningMessageFactory.java  the product rules: forecasts → MorningMessage, or the Fallback Message
 │   │                          when there's no forecast for the Home City (an empty map means the weather is unavailable)
 │   ├── MessagePublisher.java  interface: delivers a MorningMessage on one platform
 │   ├── console/
-│   │   ├── ConsoleMessageComposer.java   MorningMessage → plain text
+│   │   ├── ConsoleMessageComposer.java   MorningMessage → plain text, the Attribution as the last line
 │   │   └── ConsoleMessagePublisher.java  prints its composer's text to the run log
 │   └── discord/
-│       ├── DiscordSettings.java   webhook URL, bot name, avatar, accent color, footer
-│       ├── DiscordMessageComposer.java   MorningMessage → webhook payload + embed
-│       ├── WebhookPayload.java    payload + embed records, as Discord's webhook API takes them
+│       ├── DiscordSettings.java   webhook URL, bot name, avatar
+│       ├── DiscordException.java  the post failed or Discord rejected it
+│       ├── DiscordMessageComposer.java   MorningMessage → webhook payload, all plain text in Discord's markdown: greeting lines
+│       │                          first (they show in notifications), one City Forecast per line, Attribution as subtext
+│       ├── WebhookPayload.java    the payload record, as Discord's webhook API takes it
 │       └── DiscordMessagePublisher.java  POSTs its composer's payload to the Channel; with DRY_RUN, prints it instead
 ```
 
@@ -88,7 +90,7 @@ io/github/lefpap/morningbro/
 4. **Fetch.** `WeatherService` gets the Forecast Day for all cities in one request through `OpenMeteoClient`, which maps the response to `Forecast` records. `WeatherService` checks there is one per city, each for the Forecast Day. Unexpected or partial data is a `WeatherException`: `MorningBro` logs why the weather is unavailable and carries on with no forecasts (an empty map).
 5. **Build the message.** `MorningMessageFactory` builds the `MorningMessage`: the greeting with the Home City's emoji, the Friday Line on Fridays, and one City Forecast per city. With no forecast for the Home City, which includes no forecasts at all, it builds the Fallback Message instead: the greeting text, the Friday Line on Fridays, and the Fallback Note, with no Weather Card. It never builds a partly filled Weather Card.
 6. **Show it in the run log.** `ConsoleMessagePublisher` prints the message as plain text, so the Owner can check it.
-7. **Publish.** `DiscordMessagePublisher` turns the message into a webhook payload and POSTs it. With `DRY_RUN=true`, the payload is printed instead.
+7. **Publish.** `DiscordMessagePublisher` turns the message into a webhook payload and POSTs it. With `DRY_RUN=true`, the payload is printed instead. A failed or rejected post is a `DiscordException`, and `MorningBro` exits non-zero.
 8. **Report.** A failed post or invalid config exits non-zero. The workflow run fails, and GitHub notifies the owner. An unavailable weather does not: the Fallback Message still goes out.
 
 ## Scheduling
@@ -133,12 +135,11 @@ weather:
   alert-emoji:                          # shown after the condition emoji, never instead of it
     hot: "🥵"                           # high ≥ 35°
     freezing: "🥶"                      # low ≤ 0°
+  attribution: "Forecast by Open-Meteo"   # the forecast source's credit, which its terms require
 
 discord:
   username: "Morning Bro"
   avatar-url: null
-  color: "#6F4E37"
-  footer: "Forecast by Open-Meteo"
 ```
 
 Validation (at startup, fails the run): every `Condition` and `TemperatureAlert` has an emoji, `home-city` is one of `cities`, the hour is 0–23, the timezone is known, coordinates are in range, and there are no unknown keys.
@@ -161,6 +162,7 @@ Secrets never go in `application.yml`.
 - Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and make no network calls.
   - `OpenMeteoClientTest` runs the real client against a local `HttpServer` that serves responses recorded from Open-Meteo, in `src/test/resources/open-meteo/`. Each file in `broken/` is `athens.json` with one value changed.
   - `WeatherServiceTest` mocks `OpenMeteoClient` with Mockito. Mockito is loaded as a `-javaagent` through surefire's `argLine`, so running tests from an IDE may need that agent added to the run configuration.
+  - `DiscordMessagePublisherTest` runs the real publisher against a local `HttpServer` standing in for the webhook.
   - `MorningMessageFactoryTest` builds `Forecast`s by hand, and each composer's test builds `MorningMessage`s by hand, so neither needs a mock.
   - `MorningBro` and `ConsoleMessagePublisher` have no unit tests: one only wires features together, the other only prints `ConsoleMessageComposer`'s text. CI's dry run of the built jar covers them.
 
@@ -168,5 +170,5 @@ Secrets never go in `application.yml`.
 
 - GitHub cron is best-effort. Runs can start minutes late and are occasionally skipped.
 - Scheduled workflows are paused in public repositories after 60 days without commits.
-- Open-Meteo's free tier is non-commercial and requires attribution, shown in the message footer.
+- Open-Meteo's free tier is non-commercial and requires attribution, shown as small text below the Weather Card.
 - Open-Meteo's daily weather code is the day's *worst* condition, which is why the emoji rules use the Rain Chance to soften it.
