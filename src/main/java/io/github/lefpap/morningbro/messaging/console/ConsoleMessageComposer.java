@@ -7,19 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Morning Message as plain text for the console: the greeting lines, then either the Fallback Note or a blank line
- * and one City Forecast per line.
+ * The Morning Message as plain text for the console: the greeting lines, then either the Fallback Note or a blank line,
+ * one City Forecast per line, and the Attribution.
  */
 public class ConsoleMessageComposer {
 
     public String compose(MorningMessage message) {
         List<String> lines = new ArrayList<>();
         switch (message) {
-            case MorningMessage.WithWeather(var greeting, var homeWeather, var fridayLine, var weatherCard) -> {
+            case MorningMessage.WithWeather(
+                var greeting, var homeWeather, var fridayLine, var weatherCard, var attribution) -> {
                 lines.add(greeting + homeWeather);
                 fridayLine.ifPresent(lines::add);
                 lines.add("");
                 weatherCard.forEach(cityForecast -> lines.add(line(cityForecast)));
+                lines.add(attribution);
             }
             case MorningMessage.Fallback(var greeting, var fridayLine, var fallbackNote) -> {
                 lines.add(greeting);

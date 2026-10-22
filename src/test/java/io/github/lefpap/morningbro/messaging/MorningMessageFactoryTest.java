@@ -43,7 +43,8 @@ class MorningMessageFactoryTest {
                             entry(Condition.THUNDERSTORM, "⛈️"),
                             entry(Condition.UNKNOWN, "🌡️"),
                             entry(Condition.UNLIKELY_RAIN, "🌂")),
-                    Map.of(TemperatureAlert.HOT, "🥵", TemperatureAlert.FREEZING, "🥶")));
+                    Map.of(TemperatureAlert.HOT, "🥵", TemperatureAlert.FREEZING, "🥶"),
+                    "Forecast by Open-Meteo"));
 
     @Test
     void theGreetingCarriesTheHomeCitysEmojiAndTemperatureAlert() {
@@ -78,6 +79,13 @@ class MorningMessageFactoryTest {
         assertThat(message.weatherCard()).containsExactly(
                 new CityForecast(ATHENS, "☀️", 17, 27, OptionalInt.empty()),
                 new CityForecast(BRUSSELS, "🌨️🥶", -4, 1, OptionalInt.empty()));
+    }
+
+    @Test
+    void theWeatherCardCarriesTheAttribution() {
+        MorningMessage.WithWeather message = withWeather(factory.create(dryDay(WEDNESDAY), WEDNESDAY));
+
+        assertThat(message.attribution()).isEqualTo("Forecast by Open-Meteo");
     }
 
     /** The Rain Chance Display Threshold is 20. An empty cell means no Rain Chance: in the forecast, or to show. */

@@ -87,12 +87,11 @@ public record Settings(
                 file.weather().likelyRainPercent(),
                 file.weather().showRainPercent(),
                 emoji,
-                alertEmoji),
+                alertEmoji,
+                file.weather().attribution()),
             new DiscordSettings(
                 file.discord().username(),
                 file.discord().avatarUrl(),
-                file.discord().color(),
-                file.discord().footer(),
                 webhookUrl),
             force,
             dryRun);

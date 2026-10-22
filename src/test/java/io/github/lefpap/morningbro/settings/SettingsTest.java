@@ -67,10 +67,10 @@ class SettingsTest {
                 TemperatureAlert.HOT, "🥵",
                 TemperatureAlert.FREEZING, "🥶"));
 
+        assertThat(settings.weather().attribution()).isEqualTo("Forecast by Open-Meteo");
+
         assertThat(settings.discord().username()).isEqualTo("Morning Bro");
         assertThat(settings.discord().avatarUrl()).isEmpty();
-        assertThat(settings.discord().color()).isEqualTo("#6F4E37");
-        assertThat(settings.discord().footer()).isEqualTo("Forecast by Open-Meteo");
         assertThat(settings.discord().webhookUrl()).contains(WEBHOOK_URL);
     }
 

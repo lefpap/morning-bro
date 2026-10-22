@@ -28,7 +28,8 @@ class WeatherEmojiTest {
                     entry(Condition.THUNDERSTORM, "⛈️"),
                     entry(Condition.UNKNOWN, "🌡️"),
                     entry(Condition.UNLIKELY_RAIN, "🌂")),
-            Map.of(TemperatureAlert.HOT, "🥵", TemperatureAlert.FREEZING, "🥶")));
+            Map.of(TemperatureAlert.HOT, "🥵", TemperatureAlert.FREEZING, "🥶"),
+            "Forecast by Open-Meteo"));
 
     /** Every weather code Open-Meteo documents, grouped by the Condition it means. */
     @ParameterizedTest

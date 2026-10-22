@@ -17,11 +17,13 @@ public class MorningMessageFactory {
     private final GreetingSettings greeting;
     private final WeatherEmoji weatherEmoji;
     private final int showRainPercent;
+    private final String attribution;
 
     public MorningMessageFactory(GreetingSettings greeting, WeatherSettings weather) {
         this.greeting = greeting;
         this.weatherEmoji = new WeatherEmoji(weather);
         this.showRainPercent = weather.showRainPercent();
+        this.attribution = weather.attribution();
     }
 
     /**
@@ -41,7 +43,8 @@ public class MorningMessageFactory {
         List<CityForecast> weatherCard = forecastsByCity.entrySet().stream()
             .map(entry -> cityForecast(entry.getKey(), entry.getValue()))
             .toList();
-        return new MorningMessage.WithWeather(greeting.text(), weatherEmoji.emoji(home), fridayLine, weatherCard);
+        return new MorningMessage.WithWeather(
+            greeting.text(), weatherEmoji.emoji(home), fridayLine, weatherCard, attribution);
     }
 
     private Optional<Forecast> homeForecast(Map<City, Forecast> forecastsByCity) {
