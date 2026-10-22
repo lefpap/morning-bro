@@ -6,6 +6,7 @@ import io.github.lefpap.morningbro.messaging.console.ConsoleMessagePublisher;
 import io.github.lefpap.morningbro.messaging.discord.DiscordMessageComposer;
 import io.github.lefpap.morningbro.messaging.discord.DiscordException;
 import io.github.lefpap.morningbro.messaging.discord.DiscordMessagePublisher;
+import io.github.lefpap.morningbro.schedule.SendWindow;
 import io.github.lefpap.morningbro.settings.Settings;
 import io.github.lefpap.morningbro.settings.SettingsException;
 import io.github.lefpap.morningbro.weather.*;
@@ -22,6 +23,16 @@ void main() {
 }
 
 void run(Settings settings) {
+    IO.println(settings.summary());
+
+    Instant now = Instant.now();
+    SendWindow sendWindow = new SendWindow(settings.schedule(), settings.force());
+
+    if (!sendWindow.isOpen(now)) {
+        IO.println("It isn't the Post Time, so nothing is posted.");
+        return;
+    }
+
     OpenMeteoClient openMeteoClient = new OpenMeteoClient();
     WeatherService weatherService = new WeatherService(openMeteoClient);
     MorningMessageFactory messageFactory = new MorningMessageFactory(settings.greeting(), settings.weather());
@@ -29,9 +40,7 @@ void run(Settings settings) {
     MessagePublisher discordPublisher =
         new DiscordMessagePublisher(new DiscordMessageComposer(settings.discord()), settings.discord(), settings.dryRun());
 
-    IO.println(settings.summary());
-
-    LocalDate forecastDay = LocalDate.now(settings.schedule().timezone());
+    LocalDate forecastDay = LocalDate.ofInstant(now, settings.schedule().timezone());
     IO.println("Forecast Day: " + forecastDay);
     Map<City, Forecast> forecastsByCity = fetchForecastsByCity(weatherService, settings.cities(), forecastDay);
     MorningMessage message = messageFactory.create(forecastsByCity, forecastDay);
