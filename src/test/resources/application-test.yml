@@ -30,9 +30,8 @@ weather:
   alert-emoji:
     hot: "🥵"
     freezing: "🥶"
+  attribution: "Forecast by Open-Meteo"
 
 discord:
   username: "Morning Bro"
   avatar-url: null
-  color: "#6F4E37"
-  footer: "Forecast by Open-Meteo"

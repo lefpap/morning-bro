@@ -26,7 +26,7 @@ Each message has up to three parts:
 
 2. **The Friday line**: on **Fridays** only, a second line: *"Take it easy Friday! 😎"*
 
-3. **The weather card**: a compact, always-visible block below the greeting, with one entry per city, shown side by side where space allows. Each entry shows:
+3. **The weather report**: a compact list below the greeting, one line per city. Each line shows:
    - the city's flag and name
    - one emoji summarizing the day's weather, followed by a temperature alert on very hot or freezing days
    - the day's low and high temperature, rounded to whole degrees Celsius
@@ -37,16 +37,14 @@ Each message has up to three parts:
 > Good Morning — Καλημέρα! ☕☀️
 > Take it easy Friday! 😎
 >
-> | 🇬🇷 Athens | 🇧🇪 Brussels | 🇮🇹 Milan |
-> |---|---|---|
-> | ☀️ 17–27° | 🌦️ 9–14° · ☔ 30% | ⛅ 11–20° |
->
-> *Forecast by \<weather source\>*
+> 🇬🇷 **Athens** ☀️ 17–27°<br>
+> 🇧🇪 **Brussels** 🌦️ 9–14° · ☔ 30%<br>
+> 🇮🇹 **Milan** ⛅ 11–20°<br>
+> <sub>Forecast by \<weather source\></sub>
 
 ### Who it's from
 - It posts under its own identity, named **"Morning Bro"**, so it doesn't look like a generic system message.
 - It can optionally have its own profile picture.
-- The weather card uses a warm, coffee-brown accent.
 
 ## Weather rules
 
@@ -84,11 +82,11 @@ Examples: Athens, clear, 24–37° → `☀️🥵 24–37°`. Milan, snowing, -
 - If the forecast doesn't include a rain chance, nothing is shown, and the emoji follows the forecast as-is.
 
 ### Attribution
-The weather card credits its forecast source, as the source's terms require.
+The weather report credits its forecast source, as the source's terms require.
 
 ## When things go wrong
 
-- **Weather unavailable:** the greeting still goes out, without the weather emoji, including the Friday line, with a light-hearted note: *"(weather is taking the day off)"*. There is no weather card. The ritual never skips because of the weather.
+- **Weather unavailable:** the greeting still goes out, without the weather emoji, including the Friday line, with a light-hearted note: *"(weather is taking the day off)"*. There is no weather report. The ritual never skips because of the weather.
 - **Posting fails:** the owner is notified, so a silent outage doesn't go unnoticed.
 - **Partial or unexpected weather data:** treated as "weather unavailable". A message that is wrong or half-filled is never posted.
 
@@ -99,8 +97,8 @@ All of these live in **one human-readable settings file**, so the owner can chan
 - the home city whose weather emoji and temperature alert appear in the greeting line
 - the posting time and the reference timezone (default: 08:00, Athens)
 - the greeting, the Friday line, and the fallback note
-- the emoji used for each weather condition and temperature alert
-- the bot's name, picture, accent color, and attribution text
+- the emoji used for each weather condition and temperature alert, and the forecast's attribution text
+- the bot's name and picture
 - the "unlikely rain" and "show rain chance" thresholds
 
 A mistake in the settings (a missing emoji, an unknown home city, an invalid time) is caught before anything is posted, and the owner is notified. Secrets never live in the settings file.

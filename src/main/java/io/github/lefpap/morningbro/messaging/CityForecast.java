@@ -1,11 +1,11 @@
-package io.github.lefpap.morningbro.greeting;
+package io.github.lefpap.morningbro.messaging;
 
 import io.github.lefpap.morningbro.weather.City;
 
 import java.util.OptionalInt;
 
 /**
- * One city's entry in the Weather Card.
+ * One city's entry in the Weather Report.
  *
  * @param city       the city, for its flag and name
  * @param emoji      the Condition emoji followed by any Temperature Alert

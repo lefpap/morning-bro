@@ -19,9 +19,10 @@ record SettingsFile(Schedule schedule, List<City> cities, Greeting greeting, Wea
             int likelyRainPercent,
             int showRainPercent,
             Map<String, String> emoji,
-            Map<String, String> alertEmoji) {
+            Map<String, String> alertEmoji,
+            String attribution) {
     }
 
-    record Discord(String username, Optional<String> avatarUrl, String color, String footer) {
+    record Discord(String username, Optional<String> avatarUrl) {
     }
 }

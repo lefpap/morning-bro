@@ -4,7 +4,7 @@ status: accepted
 
 # Open-Meteo for forecasts
 
-We get forecasts from Open-Meteo because it's free, needs no API key or account, and returns the Forecast Day for every city in one request. Its free tier is non-commercial and requires Attribution, which the Weather Card shows.
+We get forecasts from Open-Meteo because it's free, needs no API key or account, and returns the Forecast Day for every city in one request. Its free tier is non-commercial and requires Attribution, which the Weather Report shows.
 
 ## Consequences
 

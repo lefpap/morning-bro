@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.greeting;
+package io.github.lefpap.morningbro.messaging;
 
 import io.github.lefpap.morningbro.weather.*;
 
@@ -17,11 +17,13 @@ public class MorningMessageFactory {
     private final GreetingSettings greeting;
     private final WeatherEmoji weatherEmoji;
     private final int showRainPercent;
+    private final String attribution;
 
     public MorningMessageFactory(GreetingSettings greeting, WeatherSettings weather) {
         this.greeting = greeting;
         this.weatherEmoji = new WeatherEmoji(weather);
         this.showRainPercent = weather.showRainPercent();
+        this.attribution = weather.attribution();
     }
 
     /**
@@ -38,10 +40,11 @@ public class MorningMessageFactory {
     }
 
     private MorningMessage withWeather(Map<City, Forecast> forecastsByCity, Forecast home, Optional<String> fridayLine) {
-        List<CityForecast> weatherCard = forecastsByCity.entrySet().stream()
+        List<CityForecast> weatherReport = forecastsByCity.entrySet().stream()
             .map(entry -> cityForecast(entry.getKey(), entry.getValue()))
             .toList();
-        return new MorningMessage.WithWeather(greeting.text(), weatherEmoji.emoji(home), fridayLine, weatherCard);
+        return new MorningMessage.WithWeather(
+            greeting.text(), weatherEmoji.emoji(home), fridayLine, weatherReport, attribution);
     }
 
     private Optional<Forecast> homeForecast(Map<City, Forecast> forecastsByCity) {

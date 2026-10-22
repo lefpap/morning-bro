@@ -1,7 +1,7 @@
 package io.github.lefpap.morningbro.settings;
 
-import io.github.lefpap.morningbro.greeting.discord.DiscordSettings;
-import io.github.lefpap.morningbro.greeting.GreetingSettings;
+import io.github.lefpap.morningbro.messaging.discord.DiscordSettings;
+import io.github.lefpap.morningbro.messaging.GreetingSettings;
 import io.github.lefpap.morningbro.schedule.ScheduleSettings;
 import io.github.lefpap.morningbro.weather.City;
 import io.github.lefpap.morningbro.weather.Condition;
@@ -87,12 +87,11 @@ public record Settings(
                 file.weather().likelyRainPercent(),
                 file.weather().showRainPercent(),
                 emoji,
-                alertEmoji),
+                alertEmoji,
+                file.weather().attribution()),
             new DiscordSettings(
                 file.discord().username(),
                 file.discord().avatarUrl(),
-                file.discord().color(),
-                file.discord().footer(),
                 webhookUrl),
             force,
             dryRun);

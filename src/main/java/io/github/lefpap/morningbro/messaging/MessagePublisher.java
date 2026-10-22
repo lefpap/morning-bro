@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.greeting;
+package io.github.lefpap.morningbro.messaging;
 
 /**
  * Delivers a Morning Message on one platform. Each implementation shows it in that platform's own structure and format,
