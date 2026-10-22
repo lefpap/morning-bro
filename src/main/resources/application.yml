@@ -1,5 +1,5 @@
 schedule:
-  hour: 8
+  hour: 21
   timezone: Europe/Athens
 
 cities:

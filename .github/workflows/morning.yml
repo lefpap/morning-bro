@@ -3,7 +3,7 @@ name: Morning
 on:
   # Hourly, because cron runs in UTC: the app decides whether it's the Post Time.
   schedule:
-    - cron: "7 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
