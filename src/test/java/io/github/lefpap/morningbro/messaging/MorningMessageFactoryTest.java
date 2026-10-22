@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.greeting;
+package io.github.lefpap.morningbro.messaging;
 
 import io.github.lefpap.morningbro.weather.City;
 import io.github.lefpap.morningbro.weather.Condition;

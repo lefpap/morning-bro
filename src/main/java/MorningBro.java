@@ -1,8 +1,8 @@
-import io.github.lefpap.morningbro.greeting.MessagePublisher;
-import io.github.lefpap.morningbro.greeting.MorningMessage;
-import io.github.lefpap.morningbro.greeting.MorningMessageFactory;
-import io.github.lefpap.morningbro.greeting.console.ConsoleComposer;
-import io.github.lefpap.morningbro.greeting.console.ConsolePublisher;
+import io.github.lefpap.morningbro.messaging.MessagePublisher;
+import io.github.lefpap.morningbro.messaging.MorningMessage;
+import io.github.lefpap.morningbro.messaging.MorningMessageFactory;
+import io.github.lefpap.morningbro.messaging.console.ConsoleMessageComposer;
+import io.github.lefpap.morningbro.messaging.console.ConsoleMessagePublisher;
 import io.github.lefpap.morningbro.settings.Settings;
 import io.github.lefpap.morningbro.settings.SettingsException;
 import io.github.lefpap.morningbro.weather.*;
@@ -20,7 +20,7 @@ void run(Settings settings) {
     OpenMeteoClient openMeteoClient = new OpenMeteoClient();
     WeatherService weatherService = new WeatherService(openMeteoClient);
     MorningMessageFactory messageFactory = new MorningMessageFactory(settings.greeting(), settings.weather());
-    MessagePublisher messagePublisher = new ConsolePublisher(new ConsoleComposer());
+    MessagePublisher messagePublisher = new ConsoleMessagePublisher(new ConsoleMessageComposer());
 
     IO.println(settings.summary());
 

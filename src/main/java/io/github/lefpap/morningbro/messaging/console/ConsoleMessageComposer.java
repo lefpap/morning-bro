@@ -1,7 +1,7 @@
-package io.github.lefpap.morningbro.greeting.console;
+package io.github.lefpap.morningbro.messaging.console;
 
-import io.github.lefpap.morningbro.greeting.CityForecast;
-import io.github.lefpap.morningbro.greeting.MorningMessage;
+import io.github.lefpap.morningbro.messaging.CityForecast;
+import io.github.lefpap.morningbro.messaging.MorningMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  * The Morning Message as plain text for the console: the greeting lines, then either the Fallback Note or a blank line
  * and one City Forecast per line.
  */
-public class ConsoleComposer {
+public class ConsoleMessageComposer {
 
     public String compose(MorningMessage message) {
         List<String> lines = new ArrayList<>();

@@ -1,7 +1,7 @@
-package io.github.lefpap.morningbro.greeting.console;
+package io.github.lefpap.morningbro.messaging.console;
 
-import io.github.lefpap.morningbro.greeting.CityForecast;
-import io.github.lefpap.morningbro.greeting.MorningMessage;
+import io.github.lefpap.morningbro.messaging.CityForecast;
+import io.github.lefpap.morningbro.messaging.MorningMessage;
 import io.github.lefpap.morningbro.weather.City;
 import org.junit.jupiter.api.Test;
 
@@ -11,12 +11,12 @@ import java.util.OptionalInt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ConsoleComposerTest {
+class ConsoleMessageComposerTest {
 
     private static final City ATHENS = new City("Athens", "🇬🇷", 37.98, 23.73);
     private static final City BRUSSELS = new City("Brussels", "🇧🇪", 50.85, 4.35);
 
-    private final ConsoleComposer composer = new ConsoleComposer();
+    private final ConsoleMessageComposer composer = new ConsoleMessageComposer();
 
     @Test
     void showsTheGreetingLinesThenABlankLineThenOneCityForecastPerLine() {

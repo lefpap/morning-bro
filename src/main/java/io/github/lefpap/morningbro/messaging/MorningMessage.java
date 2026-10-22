@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.greeting;
+package io.github.lefpap.morningbro.messaging;
 
 import java.util.List;
 import java.util.Optional;
