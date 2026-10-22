@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.discord;
+package io.github.lefpap.morningbro.greeting.discord;
 
 import java.util.Optional;
 
