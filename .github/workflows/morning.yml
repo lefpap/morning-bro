@@ -1,0 +1,24 @@
+name: Morning
+
+on:
+  # Hourly, because cron runs in UTC: the app decides whether it's the Post Time.
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 27
+          cache: maven
+      # CI runs the tests at push time, so a broken test can't cancel a morning post.
+      - run: ./mvnw --batch-mode package -DskipTests
+      - run: java -jar target/morning-bro.jar
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' }}
