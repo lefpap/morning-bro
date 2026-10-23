@@ -38,8 +38,8 @@ class SettingsTest {
     void loadsAValidSettingsFileIntoTheFeatureSettings() {
         Settings settings = load(VALID);
 
-        assertThat(settings.schedule().hour()).isEqualTo(8);
-        assertThat(settings.schedule().timezone()).isEqualTo(ZoneId.of("Europe/Athens"));
+        assertThat(settings.postTime().hour()).isEqualTo(8);
+        assertThat(settings.postTime().timezone()).isEqualTo(ZoneId.of("Europe/Athens"));
         assertThat(settings.cities()).containsExactly(
                 new City("Athens", "🇬🇷", 37.98, 23.73),
                 new City("Brussels", "🇧🇪", 50.85, 4.35));
@@ -177,7 +177,7 @@ class SettingsTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 23})
     void acceptsTheFirstAndLastHourOfTheDay(int hour) {
-        assertThat(load(VALID.replace("hour: 8", "hour: " + hour)).schedule().hour()).isEqualTo(hour);
+        assertThat(load(VALID.replace("hour: 8", "hour: " + hour)).postTime().hour()).isEqualTo(hour);
     }
 
     @Test

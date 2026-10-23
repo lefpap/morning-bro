@@ -9,24 +9,23 @@ import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SendWindowTest {
+class PostTimeTest {
 
     /** The Post Time is 08:00 in Athens, which is UTC+2 in winter and UTC+3 in summer. */
-    private final ScheduleSettings schedule = new ScheduleSettings(8, ZoneId.of("Europe/Athens"));
-    private final SendWindow window = new SendWindow(schedule, false);
+    private final PostTime postTime = new PostTime(8, ZoneId.of("Europe/Athens"));
 
     /** 08:00, 08:07 and 08:59 Athens time in winter. */
     @ParameterizedTest
     @ValueSource(strings = {"2026-01-15T06:00:00Z", "2026-01-15T06:07:00Z", "2026-01-15T06:59:59Z"})
     void aRunWithinThePostTimeHourProceeds(String now) {
-        assertThat(window.isOpen(Instant.parse(now))).isTrue();
+        assertThat(postTime.isDueAt(Instant.parse(now))).isTrue();
     }
 
     /** 07:59 and 09:00 Athens time in winter, 08:00 UTC, and 08:00 the evening before. */
     @ParameterizedTest
     @ValueSource(strings = {"2026-01-15T05:59:59Z", "2026-01-15T07:00:00Z", "2026-01-15T08:00:00Z", "2026-01-14T18:00:00Z"})
     void anyOtherHourDoesNothing(String now) {
-        assertThat(window.isOpen(Instant.parse(now))).isFalse();
+        assertThat(postTime.isDueAt(Instant.parse(now))).isFalse();
     }
 
     /**
@@ -39,13 +38,7 @@ class SendWindowTest {
             "2026-07-15T05:00:00Z, true", "2026-07-15T06:00:00Z, false",
             "2026-10-25T06:00:00Z, true", "2026-10-25T05:00:00Z, false"})
     void thePostTimeStaysAtTheSameLocalHourAcrossDaylightSavingChanges(String now, boolean open) {
-        assertThat(window.isOpen(Instant.parse(now))).isEqualTo(open);
+        assertThat(postTime.isDueAt(Instant.parse(now))).isEqualTo(open);
     }
 
-    /** 08:00 Athens time, 03:00 Athens time, and 08:00 UTC in summer. */
-    @ParameterizedTest
-    @ValueSource(strings = {"2026-01-15T06:00:00Z", "2026-01-15T01:00:00Z", "2026-07-15T08:00:00Z"})
-    void aForcedPostProceedsAtAnyHour(String now) {
-        assertThat(new SendWindow(schedule, true).isOpen(Instant.parse(now))).isTrue();
-    }
 }

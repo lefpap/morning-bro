@@ -2,7 +2,7 @@ package io.github.lefpap.morningbro.settings;
 
 import io.github.lefpap.morningbro.messaging.discord.DiscordSettings;
 import io.github.lefpap.morningbro.messaging.GreetingSettings;
-import io.github.lefpap.morningbro.schedule.ScheduleSettings;
+import io.github.lefpap.morningbro.schedule.PostTime;
 import io.github.lefpap.morningbro.weather.City;
 import io.github.lefpap.morningbro.weather.Condition;
 import io.github.lefpap.morningbro.weather.TemperatureAlert;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public record Settings(
     String source,
-    ScheduleSettings schedule,
+    PostTime postTime,
     List<City> cities,
     GreetingSettings greeting,
     WeatherSettings weather,
@@ -76,7 +76,7 @@ public record Settings(
 
         return new Settings(
             source,
-            new ScheduleSettings(file.schedule().hour(), timezone),
+            new PostTime(file.schedule().hour(), timezone),
             List.copyOf(file.cities()),
             new GreetingSettings(
                 file.greeting().text(),
@@ -113,8 +113,8 @@ public record Settings(
             source,
             cities.stream().map(City::name).collect(Collectors.joining(", ")),
             greeting.homeCity(),
-            schedule.hour(),
-            schedule.timezone(),
+            postTime.hour(),
+            postTime.timezone(),
             force ? "yes" : "no",
             dryRun ? "yes" : "no");
     }
