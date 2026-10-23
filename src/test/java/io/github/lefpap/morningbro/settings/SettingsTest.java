@@ -49,8 +49,8 @@ class SettingsTest {
         assertThat(settings.greeting().friday()).isEqualTo("Take it easy Friday! 😎");
         assertThat(settings.greeting().fallback()).isEqualTo("(weather is taking the day off)");
 
-        assertThat(settings.weather().likelyRainPercent()).isEqualTo(40);
-        assertThat(settings.weather().showRainPercent()).isEqualTo(20);
+        assertThat(settings.weather().unlikelyRainThreshold()).isEqualTo(40);
+        assertThat(settings.weather().rainChanceDisplayThreshold()).isEqualTo(20);
         assertThat(settings.weather().emoji()).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
                 entry(Condition.CLEAR, "☀️"),
                 entry(Condition.MOSTLY_CLEAR, "🌤️"),
@@ -111,6 +111,13 @@ class SettingsTest {
     void failsOnAnUnknownAlertEmojiKey() {
         assertLoadFails(VALID.replace("    hot:", "    windy: \"💨\"\n    hot:"))
                 .hasMessageContaining("unknown key \"weather.alert-emoji.windy\"");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"likely-rain-percent", "show-rain-percent"})
+    void failsOnAnOldRainThresholdKey(String oldKey) {
+        assertLoadFails(VALID.replace("  emoji:", "  " + oldKey + ": 30\n  emoji:"))
+                .hasMessageContaining("unknown key \"weather." + oldKey + "\"");
     }
 
     @Test

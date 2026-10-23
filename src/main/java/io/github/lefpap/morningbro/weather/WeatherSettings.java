@@ -7,8 +7,8 @@ import java.util.Map;
  * @param attributionUrl where the Attribution links to, as the forecast source's terms also require
  */
 public record WeatherSettings(
-        int likelyRainPercent,
-        int showRainPercent,
+        int unlikelyRainThreshold,
+        int rainChanceDisplayThreshold,
         Map<Condition, String> emoji,
         Map<TemperatureAlert, String> alertEmoji,
         String attribution,

@@ -99,7 +99,7 @@ All of these live in **one human-readable settings file**, so the owner can chan
 - the greeting, the Friday line, and the fallback note
 - the emoji used for each weather condition and temperature alert, and the forecast's attribution text and link
 - the bot's name and picture
-- the "unlikely rain" and "show rain chance" thresholds
+- the "unlikely rain" and "show rain chance" thresholds (`weather.unlikely-rain-threshold` and `weather.rain-chance-display-threshold`)
 
 A mistake in the settings (a missing emoji, an unknown home city, an invalid time) is caught before anything is posted, and the owner is notified. Secrets never live in the settings file.
 

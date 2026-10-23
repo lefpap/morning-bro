@@ -84,8 +84,8 @@ public record Settings(
                 file.greeting().friday(),
                 file.greeting().fallback()),
             new WeatherSettings(
-                file.weather().likelyRainPercent(),
-                file.weather().showRainPercent(),
+                file.weather().unlikelyRainThreshold(),
+                file.weather().rainChanceDisplayThreshold(),
                 emoji,
                 alertEmoji,
                 file.weather().attribution(),

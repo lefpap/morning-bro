@@ -16,8 +16,8 @@ record SettingsFile(Schedule schedule, List<City> cities, Greeting greeting, Wea
     }
 
     record Weather(
-            int likelyRainPercent,
-            int showRainPercent,
+            int unlikelyRainThreshold,
+            int rainChanceDisplayThreshold,
             Map<String, String> emoji,
             Map<String, String> alertEmoji,
             String attribution,

@@ -14,8 +14,8 @@ greeting:
   fallback: "(weather is taking the day off)"
 
 weather:
-  likely-rain-percent: 40               # below this, rain/storm shows as unlikely-rain
-  show-rain-percent: 20                 # at or above this, "☔ NN%" is shown
+  unlikely-rain-threshold: 40           # below this, rain/storm shows as unlikely-rain
+  rain-chance-display-threshold: 20     # at or above this, "☔ NN%" is shown
   emoji:
     clear: "☀️"
     mostly-clear: "🌤️"
