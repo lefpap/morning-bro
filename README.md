@@ -16,7 +16,7 @@ It runs on GitHub Actions, with no server to look after. For what it does and wh
 
 ## How it runs
 
-The **Morning** workflow starts every hour, at minute :07. Each run checks whether it's the Post Time (08:00 Athens time by default) and only posts then, so the post stays at the same local time across daylight-saving changes. All other runs end without posting.
+The **Morning** workflow starts every hour, at minute :37. Each run checks whether it was scheduled for the Post Time (08:00 Athens time by default) and only posts then, so the post stays at the same local time across daylight-saving changes. All other runs end without posting. The workflow's schedule doesn't need editing when you change the Post Time.
 
 You can also make a **Forced Post** at any time (see below). It posts straight away, and it doesn't stop or replace that day's scheduled post.
 
@@ -87,7 +87,7 @@ To try a Settings File without rebuilding, point `SETTINGS_PATH` at it, e.g. `SE
 
 ## Good to know
 
-- **GitHub may start scheduled runs late, or skip them.** A run that starts after the Post Time hour has passed doesn't post, so on rare days there may be no message. That's on purpose: a missed day is better than two posts.
+- **GitHub may start scheduled runs late, or skip them.** A run counts for the hour it was scheduled for, not the time it starts. So a late Post Time run still posts, just late, and a late run from the hour before never makes a second post. A run GitHub skips is a missed day: that's on purpose, as a missed day is better than two posts.
 - **GitHub pauses scheduled workflows in a public repository after 60 days without a commit.** If the posts stop, check the Actions tab, re-enable the Morning workflow, or push any commit.
 - **Every push runs CI,** which runs the tests and a Dry Run with the real Settings File, so a broken change fails there instead of at the next Post Time.
 

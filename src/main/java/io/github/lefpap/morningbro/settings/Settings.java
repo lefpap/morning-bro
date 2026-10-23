@@ -2,7 +2,7 @@ package io.github.lefpap.morningbro.settings;
 
 import io.github.lefpap.morningbro.messaging.discord.DiscordSettings;
 import io.github.lefpap.morningbro.messaging.GreetingSettings;
-import io.github.lefpap.morningbro.schedule.ScheduleSettings;
+import io.github.lefpap.morningbro.schedule.PostTime;
 import io.github.lefpap.morningbro.weather.City;
 import io.github.lefpap.morningbro.weather.Condition;
 import io.github.lefpap.morningbro.weather.TemperatureAlert;
@@ -32,13 +32,14 @@ import java.util.stream.Collectors;
  */
 public record Settings(
     String source,
-    ScheduleSettings schedule,
+    PostTime postTime,
     List<City> cities,
     GreetingSettings greeting,
     WeatherSettings weather,
     DiscordSettings discord,
     boolean force,
-    boolean dryRun) {
+    boolean dryRun,
+    Optional<String> scheduledCron) {
 
     /**
      * Read from the classpath (inside the jar) unless SETTINGS_PATH points to a file on disk.
@@ -61,6 +62,7 @@ public record Settings(
         boolean force = flag(env, "FORCE", errors);
         boolean dryRun = flag(env, "DRY_RUN", errors);
         Optional<String> webhookUrl = webhookUrl(env, dryRun, errors);
+        Optional<String> scheduledCron = Optional.ofNullable(env.get("SCHEDULED_CRON")).filter(value -> !value.isBlank());
         ZoneId timezone = checkSchedule(file.schedule(), errors);
         checkCities(file.cities(), file.greeting().homeCity(), errors);
         Map<Condition, String> emoji =
@@ -76,7 +78,7 @@ public record Settings(
 
         return new Settings(
             source,
-            new ScheduleSettings(file.schedule().hour(), timezone),
+            new PostTime(file.schedule().hour(), timezone),
             List.copyOf(file.cities()),
             new GreetingSettings(
                 file.greeting().text(),
@@ -95,7 +97,8 @@ public record Settings(
                 file.discord().avatarUrl(),
                 webhookUrl),
             force,
-            dryRun);
+            dryRun,
+            scheduledCron);
     }
 
     /**
@@ -113,8 +116,8 @@ public record Settings(
             source,
             cities.stream().map(City::name).collect(Collectors.joining(", ")),
             greeting.homeCity(),
-            schedule.hour(),
-            schedule.timezone(),
+            postTime.hour(),
+            postTime.timezone(),
             force ? "yes" : "no",
             dryRun ? "yes" : "no");
     }

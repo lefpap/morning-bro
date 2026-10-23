@@ -1,10 +1,40 @@
 name: Morning
 
 on:
-  # Hourly, because cron runs in UTC: the app decides whether it's the Post Time.
+  # One entry per UTC hour, so github.event.schedule names the slot a run was scheduled for:
+  # the app judges the Post Time by that slot, not by when the run starts. Minute :37 is away
+  # from GitHub's busy top of the hour. The entries never change when the Post Time does.
   schedule:
-    - cron: "7 * * * *"
+    - cron: "37 0 * * *"
+    - cron: "37 1 * * *"
+    - cron: "37 2 * * *"
+    - cron: "37 3 * * *"
+    - cron: "37 4 * * *"
+    - cron: "37 5 * * *"
+    - cron: "37 6 * * *"
+    - cron: "37 7 * * *"
+    - cron: "37 8 * * *"
+    - cron: "37 9 * * *"
+    - cron: "37 10 * * *"
+    - cron: "37 11 * * *"
+    - cron: "37 12 * * *"
+    - cron: "37 13 * * *"
+    - cron: "37 14 * * *"
+    - cron: "37 15 * * *"
+    - cron: "37 16 * * *"
+    - cron: "37 17 * * *"
+    - cron: "37 18 * * *"
+    - cron: "37 19 * * *"
+    - cron: "37 20 * * *"
+    - cron: "37 21 * * *"
+    - cron: "37 22 * * *"
+    - cron: "37 23 * * *"
   workflow_dispatch:
+
+# Overlapping runs wait for each other instead of running side by side.
+concurrency:
+  group: morning
+  cancel-in-progress: false
 
 jobs:
   post:
@@ -22,3 +52,5 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           FORCE: ${{ github.event_name == 'workflow_dispatch' }}
+          # Empty on a Forced Post, which has no slot.
+          SCHEDULED_CRON: ${{ github.event.schedule }}
