@@ -49,8 +49,8 @@ Everything you can change lives in the Settings File, [`src/main/resources/appli
 | `greeting.home-city` | The city whose weather emoji ends the greeting. It must be one of the `cities` names |
 | `greeting.friday` | The extra line on Fridays |
 | `greeting.fallback` | The line shown when the weather is unavailable |
-| `weather.likely-rain-percent` | Below this chance of rain, a rainy or stormy day shows `unlikely-rain`'s emoji instead, so a brief shower doesn't make the whole day look gloomy |
-| `weather.show-rain-percent` | At or above this chance of rain, a city shows "☔ NN%" |
+| `weather.unlikely-rain-threshold` | Below this chance of rain, a rainy or stormy day shows `unlikely-rain`'s emoji instead, so a brief shower doesn't make the whole day look gloomy |
+| `weather.rain-chance-display-threshold` | At or above this chance of rain, a city shows "☔ NN%" |
 | `weather.emoji` | The emoji for each kind of weather |
 | `weather.alert-emoji` | The extra emoji on very hot (high of 35° or more) and freezing (low of 0° or less) days |
 | `weather.attribution`, `weather.attribution-url` | The credit to Open-Meteo and its link. Open-Meteo's terms require them, so keep both |

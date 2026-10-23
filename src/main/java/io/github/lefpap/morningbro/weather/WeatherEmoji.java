@@ -48,7 +48,7 @@ public class WeatherEmoji {
 
     private boolean isUnlikely(Forecast forecast) {
         OptionalInt rainChance = forecast.rainChance();
-        return rainChance.isPresent() && rainChance.getAsInt() < settings.likelyRainPercent();
+        return rainChance.isPresent() && rainChance.getAsInt() < settings.unlikelyRainThreshold();
     }
 
     private static Condition conditionOf(int weatherCode) {

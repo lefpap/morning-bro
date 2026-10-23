@@ -16,14 +16,14 @@ public class MorningMessageFactory {
 
     private final GreetingSettings greeting;
     private final WeatherEmoji weatherEmoji;
-    private final int showRainPercent;
+    private final int rainChanceDisplayThreshold;
     private final String attribution;
     private final String attributionUrl;
 
     public MorningMessageFactory(GreetingSettings greeting, WeatherSettings weather) {
         this.greeting = greeting;
         this.weatherEmoji = new WeatherEmoji(weather);
-        this.showRainPercent = weather.showRainPercent();
+        this.rainChanceDisplayThreshold = weather.rainChanceDisplayThreshold();
         this.attribution = weather.attribution();
         this.attributionUrl = weather.attributionUrl();
     }
@@ -58,7 +58,7 @@ public class MorningMessageFactory {
 
     private CityForecast cityForecast(City city, Forecast forecast) {
         OptionalInt rainChance = forecast.rainChance();
-        boolean showRainChance = rainChance.isPresent() && rainChance.getAsInt() >= showRainPercent;
+        boolean showRainChance = rainChance.isPresent() && rainChance.getAsInt() >= rainChanceDisplayThreshold;
         return new CityForecast(
             city,
             weatherEmoji.emoji(forecast),
