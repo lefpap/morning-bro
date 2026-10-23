@@ -34,7 +34,8 @@ class DiscordMessagePublisherTest {
         "☀️",
         Optional.empty(),
         List.of(new CityForecast(new City("Athens", "🇬🇷", 37.98, 23.73), "☀️", 17, 27, OptionalInt.empty())),
-        "Forecast by Open-Meteo");
+        "Weather data by Open-Meteo.com",
+        "https://open-meteo.com/");
 
     private final List<Request> requests = new CopyOnWriteArrayList<>();
     private HttpServer discord;
@@ -71,7 +72,7 @@ class DiscordMessagePublisherTest {
             {
               "username": "Morning Bro",
               "avatar_url": "https://example.com/coffee.png",
-              "content": "Good Morning ☕☀️\\n\\n🇬🇷 **Athens** ☀️ 17–27°\\n-# Forecast by Open-Meteo"
+              "content": "Good Morning ☕☀️\\n\\n🇬🇷 **Athens** ☀️ 17–27°\\n-# [Weather data by Open-Meteo.com](<https://open-meteo.com/>)"
             }"""));
     }
 

@@ -82,7 +82,7 @@ Examples: Athens, clear, 24–37° → `☀️🥵 24–37°`. Milan, snowing, -
 - If the forecast doesn't include a rain chance, nothing is shown, and the emoji follows the forecast as-is.
 
 ### Attribution
-The weather report credits its forecast source, as the source's terms require.
+The weather report credits its forecast source with a link to it, as the source's terms require.
 
 ## When things go wrong
 
@@ -97,7 +97,7 @@ All of these live in **one human-readable settings file**, so the owner can chan
 - the home city whose weather emoji and temperature alert appear in the greeting line
 - the posting time and the reference timezone (default: 08:00, Athens)
 - the greeting, the Friday line, and the fallback note
-- the emoji used for each weather condition and temperature alert, and the forecast's attribution text
+- the emoji used for each weather condition and temperature alert, and the forecast's attribution text and link
 - the bot's name and picture
 - the "unlikely rain" and "show rain chance" thresholds
 

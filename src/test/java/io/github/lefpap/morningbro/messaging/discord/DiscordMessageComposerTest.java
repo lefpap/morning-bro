@@ -20,7 +20,7 @@ class DiscordMessageComposerTest {
         "Morning Bro", Optional.of("https://example.com/coffee.png"), Optional.empty()));
 
     @Test
-    void postsTheGreetingLinesThenOneCityForecastPerLineThenTheAttributionAsSubtext() {
+    void postsTheGreetingLinesThenOneCityForecastPerLineThenTheAttributionAsALinkInSubtext() {
         MorningMessage message = new MorningMessage.WithWeather(
             "Good Morning ☕",
             "☀️",
@@ -28,7 +28,8 @@ class DiscordMessageComposerTest {
             List.of(
                 new CityForecast(ATHENS, "☀️", 17, 27, OptionalInt.empty()),
                 new CityForecast(BRUSSELS, "🌦️", 9, 14, OptionalInt.of(30))),
-            "Forecast by Open-Meteo");
+            "Weather data by Open-Meteo.com",
+            "https://open-meteo.com/");
 
         assertThat(composer.compose(message)).isEqualTo(new WebhookPayload(
             "Morning Bro",
@@ -39,7 +40,7 @@ class DiscordMessageComposerTest {
 
                 🇬🇷 **Athens** ☀️ 17–27°
                 🇧🇪 **Brussels** 🌦️ 9–14° · ☔ 30%
-                -# Forecast by Open-Meteo"""));
+                -# [Weather data by Open-Meteo.com](<https://open-meteo.com/>)"""));
     }
 
     @Test

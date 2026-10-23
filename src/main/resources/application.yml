@@ -31,7 +31,8 @@ weather:
   alert-emoji:                          # shown after the condition emoji, never instead of it
     hot: "🥵"                           # high ≥ 35°
     freezing: "🥶"                      # low ≤ 0°
-  attribution: "Forecast by Open-Meteo"   # the forecast source's credit, which its terms require
+  attribution: "Weather data by Open-Meteo.com"   # the forecast source's credit and link, which its terms require
+  attribution-url: "https://open-meteo.com/"
 
 discord:
   username: "Morning Bro"

@@ -88,7 +88,8 @@ public record Settings(
                 file.weather().showRainPercent(),
                 emoji,
                 alertEmoji,
-                file.weather().attribution()),
+                file.weather().attribution(),
+                file.weather().attributionUrl()),
             new DiscordSettings(
                 file.discord().username(),
                 file.discord().avatarUrl(),
