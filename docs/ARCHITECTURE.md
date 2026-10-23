@@ -42,8 +42,9 @@ io/github/lefpap/morningbro/
 │   ├── SettingsFile.java      the Settings File exactly as written, before validation
 │   └── SettingsException.java a mistake in the Settings File or the env vars
 ├── schedule/
-│   ├── ScheduleSettings.java  send hour + timezone
-│   └── SendWindow.java        is it time to post?
+│   ├── PostTime.java          Post Time + Reference Timezone: the slot a run was scheduled for, whether it's due,
+│   │                          and its Forecast Day
+│   └── ScheduleException.java SCHEDULED_CRON isn't a daily cron entry
 ├── weather/
 │   ├── City.java              name, flag, latitude, longitude
 │   ├── WeatherSettings.java   rain thresholds, emoji per condition, the Attribution and its link
@@ -82,13 +83,14 @@ io/github/lefpap/morningbro/
 - **The entry point picks the forecast source.** `MorningBro` wires `new WeatherService(new OpenMeteoClient())`; everything else uses `WeatherService` and never names the source.
 - **A weather failure is not a failed run.** `WeatherService` throws `WeatherException`; `MorningBro` logs it for the Owner and carries on with no forecasts, so the Fallback Message goes out. Nothing else catches it.
 - **One level deep, except platforms.** No sub-packages until a feature outgrows a handful of classes. The one exception is `messaging`, which keeps each platform in its own sub-package.
-- **Product rules live in pure classes** (`SendWindow`, `WeatherEmoji`, `MorningMessageFactory`, the composers), so they're testable without network access.
+- **Product rules live in pure classes** (`PostTime`, `WeatherEmoji`, `MorningMessageFactory`, the composers), so they're testable without network access.
+- **`MorningBro` only wires.** It's a compact source file, so no test can call it: anything with a branch goes in a named class. The one decision it keeps is that a Forced Post ignores the Post Time.
 
 ## Application flow
 
-1. **Trigger.** GitHub Actions runs the job hourly at minute :07, or manually (which sets `FORCE=true`).
+1. **Trigger.** GitHub Actions runs the job hourly at minute :37 and passes the cron entry as `SCHEDULED_CRON`, or runs it manually (which sets `FORCE=true`).
 2. **Load settings.** `Settings` reads `application.yml` and the env vars, and validates them. A missing file, unknown key, or invalid value fails the run.
-3. **Time gate.** `SendWindow` checks whether it's the configured hour in the configured timezone. If not, and the run isn't forced, the app exits with success.
+3. **Time gate.** `PostTime` works out the instant the run was scheduled for, or uses now without `SCHEDULED_CRON`, and checks whether that instant is in the Post Time hour. If not, and the run isn't forced, the app exits with success. The same instant gives the Forecast Day.
 4. **Fetch.** `WeatherService` gets the Forecast Day for all cities in one request through `OpenMeteoClient`, which maps the response to `Forecast` records. `WeatherService` checks there is one per city, each for the Forecast Day. Unexpected or partial data is a `WeatherException`: `MorningBro` logs why the weather is unavailable and carries on with no forecasts (an empty map).
 5. **Build the message.** `MorningMessageFactory` builds the `MorningMessage`: the greeting with the Home City's emoji, the Friday Line on Fridays, and one City Forecast per city. With no forecast for the Home City, which includes no forecasts at all, it builds the Fallback Message instead: the greeting text, the Friday Line on Fridays, and the Fallback Note, with no Weather Report. It never builds a partly filled Weather Report.
 6. **Show it in the run log.** `ConsoleMessagePublisher` prints the message as plain text, so the Owner can check it.
@@ -97,11 +99,15 @@ io/github/lefpap/morningbro/
 
 ## Scheduling
 
-GitHub Actions cron runs in UTC only. The workflow therefore runs **every hour**, and the app is the single authority on when to post. `SendWindow` matches the configured hour in the configured timezone, which keeps the post at the same local time across daylight-saving changes. Send time has one-hour granularity.
+GitHub Actions cron runs in UTC only. The workflow therefore runs **every hour**, and the app is the single authority on when to post ([ADR-0001](adr/0001-app-decides-when-to-post.md)). The Post Time is a whole hour in the Reference Timezone, so the post stays at the same local time across daylight-saving changes.
+
+A run is judged by the slot it was **scheduled** for, not by when it started ([ADR-0004](adr/0004-judge-the-post-time-by-the-scheduled-slot.md)). GitHub often starts runs late, so the workflow lists 24 cron entries, one per UTC hour at minute :37, and passes the one that fired as `SCHEDULED_CRON`. `PostTime` turns it into the latest matching instant at or before now. So a late run from the hour before never posts, and a late Post Time run still posts, for its own Forecast Day. The entries never change when the Owner changes the Post Time. A `concurrency` group stops overlapping runs from running side by side.
+
+The Post Time on a Forecast Day is resolved with `ZonedDateTime.of(day.atTime(hour, 0), timezone)`: in an hour the clock repeats it posts once, and in an hour the clock skips it posts in the hour after the gap.
 
 ## Configuration
 
-All non-secret settings live in **`src/main/resources/application.yml`**. Changing a text, emoji, city, or the send time is an edit and a commit, with no code change. The file is bundled into the jar, and the morning workflow builds the jar on every run, so a committed change applies from the next run. `SETTINGS_PATH` can point to a file on disk instead. Tests build their test cases from `src/test/resources/application-test.yml`.
+All non-secret settings live in **`src/main/resources/application.yml`**. Changing a text, emoji, city, or the Post Time is an edit and a commit, with no code change. The file is bundled into the jar, and the morning workflow builds the jar on every run, so a committed change applies from the next run. `SETTINGS_PATH` can point to a file on disk instead. Tests build their test cases from `src/test/resources/application-test.yml`.
 
 ```yaml
 schedule:
@@ -145,7 +151,7 @@ discord:
   avatar-url: null
 ```
 
-Validation (at startup, fails the run): there are no missing or unknown keys, every `Condition` and `TemperatureAlert` has an emoji, there is at least one city and no city is listed twice, `home-city` is one of `cities`, the hour is 0–23, the timezone is known, and coordinates are in range. The env vars are checked too: `FORCE` and `DRY_RUN` are `true` or `false`, and `DISCORD_WEBHOOK_URL` is set unless it's a Dry Run.
+Validation (at startup, fails the run): there are no missing or unknown keys, every `Condition` and `TemperatureAlert` has an emoji, there is at least one city and no city is listed twice, `home-city` is one of `cities`, the hour is 0–23, the timezone is known, and coordinates are in range. The env vars are checked too: `FORCE` and `DRY_RUN` are `true` or `false`, and `DISCORD_WEBHOOK_URL` is set unless it's a Dry Run. A `SCHEDULED_CRON` that isn't a daily entry like `37 5 * * *` fails the run as well.
 
 Environment variables, for secrets and runtime flags only:
 
@@ -155,18 +161,19 @@ Environment variables, for secrets and runtime flags only:
 | `SETTINGS_PATH` | env var | the bundled `application.yml` |
 | `FORCE` | set by the workflow on manual runs | `false` |
 | `DRY_RUN` | env var | `false` |
+| `SCHEDULED_CRON` | set by the workflow on scheduled runs: the cron entry that fired | unset: the run is judged by now |
 
 Secrets never go in `application.yml`.
 
 ## Build and CI
 
 - **`ci.yml`** runs on every push and PR: `mvn verify`, then a dry run of the built jar with the real `application.yml`, so a broken config fails CI before it reaches a morning run.
-- **`morning.yml`** runs hourly and on demand: builds with `-DskipTests` and runs the jar. A broken test can't cancel a morning post; CI catches it at push time.
+- **`morning.yml`** runs hourly at :37 and on demand: builds with `-DskipTests` and runs the jar. A broken test can't cancel a morning post; CI catches it at push time.
 - Tests mirror the feature packages (`src/test/java/io/github/lefpap/morningbro/<feature>/`) and make no network calls.
   - `OpenMeteoClientTest` runs the real client against a local `HttpServer` that serves responses recorded from Open-Meteo, in `src/test/resources/open-meteo/`. Each file in `broken/` is `athens.json` with one value changed.
   - `WeatherServiceTest` mocks `OpenMeteoClient` with Mockito. Mockito is loaded as a `-javaagent` through surefire's `argLine`, so running tests from an IDE may need that agent added to the run configuration.
   - `DiscordMessagePublisherTest` runs the real publisher against a local `HttpServer` standing in for the webhook.
-  - `SendWindowTest` passes fixed instants instead of reading the clock, including both daylight-saving changes in the Reference Timezone.
+  - `PostTimeTest` passes fixed instants instead of reading the clock: late runs from the hour before and from the Post Time, a slot on the previous UTC day, no `SCHEDULED_CRON`, a malformed one, and both daylight-saving changes in the Reference Timezone, including a Post Time in the repeated and the skipped hour.
   - `MorningMessageFactoryTest` builds `Forecast`s by hand, and each composer's test builds `MorningMessage`s by hand, so neither needs a mock.
   - `MorningBro` and `ConsoleMessagePublisher` have no unit tests: one only wires features together, the other only prints `ConsoleMessageComposer`'s text. CI's dry run of the built jar covers them.
 

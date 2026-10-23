@@ -38,7 +38,8 @@ public record Settings(
     WeatherSettings weather,
     DiscordSettings discord,
     boolean force,
-    boolean dryRun) {
+    boolean dryRun,
+    Optional<String> scheduledCron) {
 
     /**
      * Read from the classpath (inside the jar) unless SETTINGS_PATH points to a file on disk.
@@ -61,6 +62,7 @@ public record Settings(
         boolean force = flag(env, "FORCE", errors);
         boolean dryRun = flag(env, "DRY_RUN", errors);
         Optional<String> webhookUrl = webhookUrl(env, dryRun, errors);
+        Optional<String> scheduledCron = Optional.ofNullable(env.get("SCHEDULED_CRON")).filter(value -> !value.isBlank());
         ZoneId timezone = checkSchedule(file.schedule(), errors);
         checkCities(file.cities(), file.greeting().homeCity(), errors);
         Map<Condition, String> emoji =
@@ -95,7 +97,8 @@ public record Settings(
                 file.discord().avatarUrl(),
                 webhookUrl),
             force,
-            dryRun);
+            dryRun,
+            scheduledCron);
     }
 
     /**

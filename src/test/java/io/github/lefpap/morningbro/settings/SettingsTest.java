@@ -269,6 +269,24 @@ class SettingsTest {
     }
 
     @Test
+    void readsTheScheduledCron() {
+        Map<String, String> env = env();
+        env.put("SCHEDULED_CRON", "37 5 * * *");
+
+        assertThat(load(VALID, env).scheduledCron()).contains("37 5 * * *");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " "})
+    void treatsAnEmptyScheduledCronAsUnset(String cron) {
+        Map<String, String> env = env();
+        env.put("SCHEDULED_CRON", cron);
+
+        assertThat(load(VALID, env).scheduledCron()).isEmpty();
+        assertThat(load(VALID).scheduledCron()).isEmpty();
+    }
+
+    @Test
     void requiresTheWebhookUrl() {
         Map<String, String> env = env();
         env.remove("DISCORD_WEBHOOK_URL");

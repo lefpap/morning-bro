@@ -7,6 +7,7 @@ import io.github.lefpap.morningbro.messaging.discord.DiscordMessageComposer;
 import io.github.lefpap.morningbro.messaging.discord.DiscordException;
 import io.github.lefpap.morningbro.messaging.discord.DiscordMessagePublisher;
 import io.github.lefpap.morningbro.schedule.PostTime;
+import io.github.lefpap.morningbro.schedule.ScheduleException;
 import io.github.lefpap.morningbro.settings.Settings;
 import io.github.lefpap.morningbro.settings.SettingsException;
 import io.github.lefpap.morningbro.weather.*;
@@ -15,7 +16,7 @@ void main() {
     try {
         Settings settings = Settings.load(System.getenv());
         run(settings);
-    } catch (SettingsException e) {
+    } catch (SettingsException | ScheduleException e) {
         exit(e.getMessage());
     } catch (DiscordException e) {
         exit("The Morning Message wasn't posted: " + e.getMessage());
@@ -25,10 +26,11 @@ void main() {
 void run(Settings settings) {
     IO.println(settings.summary());
 
-    Instant now = Instant.now();
     PostTime postTime = settings.postTime();
+    Instant scheduledFor = PostTime.scheduledFor(settings.scheduledCron(), Instant.now());
+    IO.println("Scheduled for: " + scheduledFor.atZone(postTime.timezone()));
 
-    if (!settings.force() && !postTime.isDueAt(now)) {
+    if (!settings.force() && !postTime.isDueAt(scheduledFor)) {
         IO.println("It isn't the Post Time, so nothing is posted.");
         return;
     }
@@ -40,7 +42,7 @@ void run(Settings settings) {
     MessagePublisher discordPublisher =
         new DiscordMessagePublisher(new DiscordMessageComposer(settings.discord()), settings.discord(), settings.dryRun());
 
-    LocalDate forecastDay = LocalDate.ofInstant(now, postTime.timezone());
+    LocalDate forecastDay = postTime.forecastDay(scheduledFor);
     IO.println("Forecast Day: " + forecastDay);
     Map<City, Forecast> forecastsByCity = fetchForecastsByCity(weatherService, settings.cities(), forecastDay);
     MorningMessage message = messageFactory.create(forecastsByCity, forecastDay);
