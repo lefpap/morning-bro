@@ -1,6 +1,6 @@
 # Architecture
 
-How Morning Bro is built. For what it does and why, see [PRODUCT.md](PRODUCT.md).
+How Morning Bro is built. For what it does and why, see [PRODUCT.md](PRODUCT.md). For running and configuring it, see the [README](../README.md).
 
 ## Overview
 
@@ -35,16 +35,18 @@ No framework, and no Discord bot account. The job runs for seconds a day and onl
 Code is organized **by feature**. Each package owns one capability and exposes a small public API; everything else is package-private.
 
 ```
+MorningBro.java                entry point: wiring + daily flow, a compact source file in the unnamed package
 io/github/lefpap/morningbro/
-├── MorningBro.java            entry point: wiring + daily flow
 ├── settings/
-│   └── Settings.java          loads application.yml + env vars, validates, hands each feature its own part
+│   ├── Settings.java          loads application.yml + env vars, validates, hands each feature its own part
+│   ├── SettingsFile.java      the Settings File exactly as written, before validation
+│   └── SettingsException.java a mistake in the Settings File or the env vars
 ├── schedule/
 │   ├── ScheduleSettings.java  send hour + timezone
 │   └── SendWindow.java        is it time to post?
 ├── weather/
 │   ├── City.java              name, flag, latitude, longitude
-│   ├── WeatherSettings.java   rain thresholds, emoji per condition, the Attribution
+│   ├── WeatherSettings.java   rain thresholds, emoji per condition, the Attribution and its link
 │   ├── Condition.java         enum: CLEAR, RAIN, SNOW, …, UNLIKELY_RAIN, UNKNOWN
 │   ├── TemperatureAlert.java  enum: HOT, FREEZING
 │   ├── Forecast.java          day, weather code, min/max temp, rain chance
@@ -61,13 +63,13 @@ io/github/lefpap/morningbro/
 │   │                          when there's no forecast for the Home City (an empty map means the weather is unavailable)
 │   ├── MessagePublisher.java  interface: delivers a MorningMessage on one platform
 │   ├── console/
-│   │   ├── ConsoleMessageComposer.java   MorningMessage → plain text, the Attribution as the last line
+│   │   ├── ConsoleMessageComposer.java   MorningMessage → plain text, the Attribution and its URL as the last line
 │   │   └── ConsoleMessagePublisher.java  prints its composer's text to the run log
 │   └── discord/
 │       ├── DiscordSettings.java   webhook URL, bot name, avatar
 │       ├── DiscordException.java  the post failed or Discord rejected it
 │       ├── DiscordMessageComposer.java   MorningMessage → webhook payload, all plain text in Discord's markdown: greeting lines
-│       │                          first (they show in notifications), one City Forecast per line, Attribution as subtext
+│       │                          first (they show in notifications), one City Forecast per line, Attribution as a link in subtext
 │       ├── WebhookPayload.java    the payload record, as Discord's webhook API takes it
 │       └── DiscordMessagePublisher.java  POSTs its composer's payload to the Channel; with DRY_RUN, prints it instead
 ```
@@ -135,14 +137,15 @@ weather:
   alert-emoji:                          # shown after the condition emoji, never instead of it
     hot: "🥵"                           # high ≥ 35°
     freezing: "🥶"                      # low ≤ 0°
-  attribution: "Forecast by Open-Meteo"   # the forecast source's credit, which its terms require
+  attribution: "Weather data by Open-Meteo.com"   # the forecast source's credit and link, which its terms require
+  attribution-url: "https://open-meteo.com/"
 
 discord:
   username: "Morning Bro"
   avatar-url: null
 ```
 
-Validation (at startup, fails the run): every `Condition` and `TemperatureAlert` has an emoji, `home-city` is one of `cities`, the hour is 0–23, the timezone is known, coordinates are in range, and there are no unknown keys.
+Validation (at startup, fails the run): there are no missing or unknown keys, every `Condition` and `TemperatureAlert` has an emoji, there is at least one city and no city is listed twice, `home-city` is one of `cities`, the hour is 0–23, the timezone is known, and coordinates are in range. The env vars are checked too: `FORCE` and `DRY_RUN` are `true` or `false`, and `DISCORD_WEBHOOK_URL` is set unless it's a Dry Run.
 
 Environment variables, for secrets and runtime flags only:
 
@@ -171,5 +174,5 @@ Secrets never go in `application.yml`.
 
 - GitHub cron is best-effort. Runs can start minutes late and are occasionally skipped.
 - Scheduled workflows are paused in public repositories after 60 days without commits.
-- Open-Meteo's free tier is non-commercial and requires attribution, shown as small text below the Weather Report.
+- Open-Meteo's free tier is non-commercial and requires attribution with a link, shown as a small link below the Weather Report.
 - Open-Meteo's daily weather code is the day's *worst* condition, which is why the emoji rules use the Rain Chance to soften it.
