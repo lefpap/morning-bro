@@ -67,7 +67,8 @@ class SettingsTest {
                 TemperatureAlert.HOT, "🥵",
                 TemperatureAlert.FREEZING, "🥶"));
 
-        assertThat(settings.weather().attribution()).isEqualTo("Forecast by Open-Meteo");
+        assertThat(settings.weather().attribution()).isEqualTo("Weather data by Open-Meteo.com");
+        assertThat(settings.weather().attributionUrl()).isEqualTo("https://open-meteo.com/");
 
         assertThat(settings.discord().username()).isEqualTo("Morning Bro");
         assertThat(settings.discord().avatarUrl()).isEmpty();

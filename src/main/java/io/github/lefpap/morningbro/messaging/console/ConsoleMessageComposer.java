@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * The Morning Message as plain text for the console: the greeting lines, then either the Fallback Note or a blank line,
- * one City Forecast per line, and the Attribution.
+ * one City Forecast per line, and the Attribution followed by its link.
  */
 public class ConsoleMessageComposer {
 
@@ -16,12 +16,12 @@ public class ConsoleMessageComposer {
         List<String> lines = new ArrayList<>();
         switch (message) {
             case MorningMessage.WithWeather(
-                var greeting, var homeWeather, var fridayLine, var weatherReport, var attribution) -> {
+                var greeting, var homeWeather, var fridayLine, var weatherReport, var attribution, var attributionUrl) -> {
                 lines.add(greeting + homeWeather);
                 fridayLine.ifPresent(lines::add);
                 lines.add("");
                 weatherReport.forEach(cityForecast -> lines.add(line(cityForecast)));
-                lines.add(attribution);
+                lines.add("%s (%s)".formatted(attribution, attributionUrl));
             }
             case MorningMessage.Fallback(var greeting, var fridayLine, var fallbackNote) -> {
                 lines.add(greeting);

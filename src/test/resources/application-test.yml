@@ -30,7 +30,8 @@ weather:
   alert-emoji:
     hot: "🥵"
     freezing: "🥶"
-  attribution: "Forecast by Open-Meteo"
+  attribution: "Weather data by Open-Meteo.com"
+  attribution-url: "https://open-meteo.com/"
 
 discord:
   username: "Morning Bro"

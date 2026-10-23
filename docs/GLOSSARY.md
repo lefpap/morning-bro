@@ -24,7 +24,7 @@ One city's entry in the Weather Report: flag, name, Condition emoji, any Tempera
 _Avoid_: city line, entry, tile
 
 **Attribution**:
-The credit to the forecast source shown on the Weather Report, as the source's terms require.
+The credit to the forecast source, with a link to it, shown on the Weather Report as the source's terms require.
 _Avoid_: footer
 
 **Fallback Message**:

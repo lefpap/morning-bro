@@ -19,7 +19,7 @@ class ConsoleMessageComposerTest {
     private final ConsoleMessageComposer composer = new ConsoleMessageComposer();
 
     @Test
-    void showsTheGreetingLinesThenABlankLineThenOneCityForecastPerLineThenTheAttribution() {
+    void showsTheGreetingLinesThenABlankLineThenOneCityForecastPerLineThenTheAttributionWithItsLink() {
         MorningMessage message = new MorningMessage.WithWeather(
                 "Good Morning ☕",
                 "☀️",
@@ -27,7 +27,8 @@ class ConsoleMessageComposerTest {
                 List.of(
                         new CityForecast(ATHENS, "☀️", 17, 27, OptionalInt.empty()),
                         new CityForecast(BRUSSELS, "🌦️", 9, 14, OptionalInt.of(30))),
-                "Forecast by Open-Meteo");
+                "Weather data by Open-Meteo.com",
+                "https://open-meteo.com/");
 
         assertThat(composer.compose(message)).isEqualTo("""
                 Good Morning ☕☀️
@@ -35,7 +36,7 @@ class ConsoleMessageComposerTest {
 
                 🇬🇷 Athens: ☀️ 17–27°
                 🇧🇪 Brussels: 🌦️ 9–14° · ☔ 30%
-                Forecast by Open-Meteo""");
+                Weather data by Open-Meteo.com (https://open-meteo.com/)""");
     }
 
     @Test

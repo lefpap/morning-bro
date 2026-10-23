@@ -9,7 +9,8 @@ import java.util.List;
 /**
  * The Morning Message as a Discord webhook payload, posted under the Morning Bro identity. It is all plain text with
  * Discord's markdown: the greeting lines first, so they show in phone notifications, then a blank line, one City
- * Forecast per line, and the Attribution as small subtext.
+ * Forecast per line, and the Attribution as a link in small subtext. The link's URL is in angle brackets, so Discord
+ * doesn't add a preview of the site below the message.
  */
 public class DiscordMessageComposer {
 
@@ -23,12 +24,12 @@ public class DiscordMessageComposer {
         List<String> lines = new ArrayList<>();
         switch (message) {
             case MorningMessage.WithWeather(
-                var greeting, var homeWeather, var fridayLine, var weatherReport, var attribution) -> {
+                var greeting, var homeWeather, var fridayLine, var weatherReport, var attribution, var attributionUrl) -> {
                 lines.add(greeting + homeWeather);
                 fridayLine.ifPresent(lines::add);
                 lines.add("");
                 weatherReport.forEach(cityForecast -> lines.add(line(cityForecast)));
-                lines.add("-# " + attribution);
+                lines.add("-# [%s](<%s>)".formatted(attribution, attributionUrl));
             }
             case MorningMessage.Fallback(var greeting, var fridayLine, var fallbackNote) -> {
                 lines.add(greeting);

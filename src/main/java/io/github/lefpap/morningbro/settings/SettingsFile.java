@@ -20,7 +20,8 @@ record SettingsFile(Schedule schedule, List<City> cities, Greeting greeting, Wea
             int showRainPercent,
             Map<String, String> emoji,
             Map<String, String> alertEmoji,
-            String attribution) {
+            String attribution,
+            String attributionUrl) {
     }
 
     record Discord(String username, Optional<String> avatarUrl) {
