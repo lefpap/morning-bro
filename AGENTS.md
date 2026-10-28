@@ -27,7 +27,3 @@ Format: `<type>(#NN): <summary>`
 
 - Open PRs with `gh pr create`.
 - Draft the PR description with the `/pr` skill, and don't write it freehand.
-
-## Specs and plans
-
-Design specs and implementation plans live internally in `.superpowers/specs/` and `.superpowers/plans/`.
