@@ -1,3 +1,15 @@
 spring:
   application:
     name: morning-bro
+
+  main:
+    web-application-type: none
+    banner-mode: off
+
+  http:
+    serviceclient:
+      discord:
+        base-url: ${MORNING_BRO_DISCORD_WEBHOOK_URL}
+        connect-timeout: 5s
+        read-timeout: 10s
+        redirects: dont-follow
