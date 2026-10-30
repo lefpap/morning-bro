@@ -7,9 +7,14 @@ spring:
     banner-mode: off
 
   http:
+
+    clients:
+      connect-timeout: 5s
+      read-timeout: 10s
+      imperative:
+        factory: jdk
+
     serviceclient:
       discord:
         base-url: ${MORNING_BRO_DISCORD_WEBHOOK_URL}
-        connect-timeout: 5s
-        read-timeout: 10s
         redirects: dont-follow

@@ -11,7 +11,7 @@ import org.springframework.web.service.registry.ImportHttpServices;
 @ImportHttpServices(group = DiscordClientConfig.GROUP, types = DiscordWebhookClient.class)
 public class DiscordClientConfig {
 
-    // Timeouts and redirects for this group are under spring.http.serviceclient.discord in application.yaml.
+    // Group settings are under spring.http.serviceclient.discord in application.yaml.
     static final String GROUP = "discord";
 
     @Bean
