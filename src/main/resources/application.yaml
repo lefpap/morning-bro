@@ -18,6 +18,8 @@ spring:
       discord:
         base-url: ${MORNING_BRO_DISCORD_WEBHOOK_URL}
         redirects: dont-follow
+      openmeteo:
+        base-url: https://api.open-meteo.com
 
 morning-bro:
   time-zone: Europe/Athens
