@@ -18,3 +18,23 @@ spring:
       discord:
         base-url: ${MORNING_BRO_DISCORD_WEBHOOK_URL}
         redirects: dont-follow
+
+morning-bro:
+  time-zone: Europe/Athens
+  locations:
+    - name: Athens
+      country-code: GR
+      latitude: 37.98
+      longitude: 23.73
+    - name: Ikaria
+      country-code: GR
+      latitude: 37.60
+      longitude: 26.17
+    - name: Brussels
+      country-code: BE
+      latitude: 50.85
+      longitude: 4.35
+    - name: Milan
+      country-code: IT
+      latitude: 45.46
+      longitude: 9.19
