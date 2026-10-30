@@ -1,0 +1,18 @@
+package io.github.lefpap.morningbro.openmeteo;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public record OpenMeteoForecast(Daily daily) {
+
+    public record Daily(
+            List<LocalDate> time,
+            @JsonProperty("weather_code") List<Integer> weatherCode,
+            @JsonProperty("temperature_2m_max") List<Double> temperatureMax,
+            @JsonProperty("temperature_2m_min") List<Double> temperatureMin,
+            @JsonProperty("precipitation_probability_max") List<Integer> precipitationProbabilityMax) {
+    }
+
+}
