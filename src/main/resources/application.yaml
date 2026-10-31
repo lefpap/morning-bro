@@ -23,6 +23,10 @@ spring:
 
 morning-bro:
   time-zone: Europe/Athens
+  home: Athens
+  message:
+    morning: "Good Morning — Καλημέρα! ☕"
+    friday: "Take it easy Friday! 😎"
   locations:
     - name: Athens
       country-code: GR
