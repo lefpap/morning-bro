@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.discord;
+package io.github.lefpap.morningbro.notification;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

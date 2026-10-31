@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.openmeteo;
+package io.github.lefpap.morningbro.weather;
 
 import org.springframework.web.client.RestClientException;
 

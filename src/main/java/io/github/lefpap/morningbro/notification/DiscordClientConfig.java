@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.discord;
+package io.github.lefpap.morningbro.notification;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

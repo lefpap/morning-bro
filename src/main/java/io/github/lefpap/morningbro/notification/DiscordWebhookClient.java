@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.discord;
+package io.github.lefpap.morningbro.notification;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.HttpExchange;

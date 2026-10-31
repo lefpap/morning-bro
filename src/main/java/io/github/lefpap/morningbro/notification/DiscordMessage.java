@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.discord;
+package io.github.lefpap.morningbro.notification;
 
 public record DiscordMessage(String content) {
 }
