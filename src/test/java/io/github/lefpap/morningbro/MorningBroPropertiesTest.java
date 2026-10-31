@@ -17,10 +17,20 @@ class MorningBroPropertiesTest {
 
     private static final String[] VALID_PROPERTIES = {
         "morning-bro.time-zone=Europe/Athens",
+        "morning-bro.home=Athens",
+        "morning-bro.message.morning=Good Morning",
+        "morning-bro.message.friday=Take it easy Friday!",
         "morning-bro.locations[0].name=Athens",
         "morning-bro.locations[0].country-code=GR",
         "morning-bro.locations[0].latitude=37.98",
         "morning-bro.locations[0].longitude=23.73"
+    };
+
+    private static final String[] BRUSSELS_PROPERTIES = {
+        "morning-bro.locations[1].name=Brussels",
+        "morning-bro.locations[1].country-code=BE",
+        "morning-bro.locations[1].latitude=50.85",
+        "morning-bro.locations[1].longitude=4.35"
     };
 
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
@@ -29,15 +39,13 @@ class MorningBroPropertiesTest {
     @Test
     void bindsValidConfigurationInLocationOrder() {
         runner.withPropertyValues(VALID_PROPERTIES)
-            .withPropertyValues(
-                "morning-bro.locations[1].name=Brussels",
-                "morning-bro.locations[1].country-code=BE",
-                "morning-bro.locations[1].latitude=50.85",
-                "morning-bro.locations[1].longitude=4.35")
+            .withPropertyValues(BRUSSELS_PROPERTIES)
             .run(context -> {
                 assertThat(context).hasNotFailed();
                 MorningBroProperties properties = context.getBean(MorningBroProperties.class);
                 assertThat(properties.timeZone()).isEqualTo(ZoneId.of("Europe/Athens"));
+                assertThat(properties.home()).isEqualTo("Athens");
+                assertThat(properties.message()).isEqualTo(new MorningBroProperties.Message("Good Morning", "Take it easy Friday!"));
                 assertThat(properties.locations()).containsExactly(
                     new MorningBroProperties.Location("Athens", "GR", 37.98, 23.73),
                     new MorningBroProperties.Location("Brussels", "BE", 50.85, 4.35));
@@ -47,6 +55,9 @@ class MorningBroPropertiesTest {
     @ParameterizedTest
     @CsvSource({
         "morning-bro.time-zone, timeZone",
+        "morning-bro.home, home",
+        "morning-bro.message.morning, message.morning",
+        "morning-bro.message.friday, message.friday",
         "morning-bro.locations[0].name, locations[0].name",
         "morning-bro.locations[0].country-code, locations[0].countryCode",
         "morning-bro.locations[0].latitude, locations[0].latitude",
@@ -68,6 +79,44 @@ class MorningBroPropertiesTest {
             .withPropertyValues("morning-bro.time-zone=Europe/Athen")
             .run(context -> assertThat(context).getFailure()
                 .hasStackTraceContaining("morning-bro.time-zone"));
+    }
+
+    @Test
+    void missingMessageGroupFailsStartup() {
+        String[] properties = Arrays.stream(VALID_PROPERTIES)
+            .filter(value -> !value.startsWith("morning-bro.message."))
+            .toArray(String[]::new);
+
+        runner.withPropertyValues(properties)
+            .run(context -> assertThat(context).getFailure()
+                .hasStackTraceContaining("field 'message'"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"morning", "friday"})
+    void blankMessageFailsStartup(String key) {
+        runner.withPropertyValues(VALID_PROPERTIES)
+            .withPropertyValues("morning-bro.message." + key + "= ")
+            .run(context -> assertThat(context).getFailure()
+                .hasStackTraceContaining("field 'message." + key + "'"));
+    }
+
+    // Exact, case-sensitive match against location names.
+    @ParameterizedTest
+    @ValueSource(strings = {"athens", "ATHENS", "Athen", "Brussels"})
+    void unknownHomeFailsStartup(String home) {
+        runner.withPropertyValues(VALID_PROPERTIES)
+            .withPropertyValues("morning-bro.home=" + home)
+            .run(context -> assertThat(context).getFailure()
+                .hasStackTraceContaining("home must match the name of one of the locations"));
+    }
+
+    @Test
+    void homeMayBeAnyLocation() {
+        runner.withPropertyValues(VALID_PROPERTIES)
+            .withPropertyValues(BRUSSELS_PROPERTIES)
+            .withPropertyValues("morning-bro.home=Brussels")
+            .run(context -> assertThat(context).hasNotFailed());
     }
 
     @Test

@@ -18,7 +18,14 @@ import java.util.List;
 @ConfigurationProperties("morning-bro")
 public record MorningBroProperties(
         @NotNull ZoneId timeZone,
+        @NotBlank String home,
+        @NotNull @Valid Message message,
         @NotEmpty List<@Valid Location> locations) {
+
+    public record Message(
+            @NotBlank String morning,
+            @NotBlank String friday) {
+    }
 
     public record Location(
             @NotBlank String name,
@@ -34,6 +41,15 @@ public record MorningBroProperties(
             return true;
         }
         return locations.stream().map(Location::name).distinct().count() == locations.size();
+    }
+
+    // home must name a location exactly (case-sensitive), so a typo fails startup instead of dropping the header emoji.
+    @AssertTrue(message = "home must match the name of one of the locations")
+    public boolean isHomeKnown() {
+        if (home == null || locations == null) {
+            return true;
+        }
+        return locations.stream().map(Location::name).anyMatch(home::equals);
     }
 
 }
