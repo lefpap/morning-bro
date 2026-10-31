@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.openmeteo;
+package io.github.lefpap.morningbro.weather;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +11,12 @@ import java.nio.charset.StandardCharsets;
 
 @Configuration(proxyBeanMethods = false)
 @ImportHttpServices(group = OpenMeteoClientConfig.GROUP, types = OpenMeteoClient.class)
-public class OpenMeteoClientConfig {
+class OpenMeteoClientConfig {
 
     static final String GROUP = "openmeteo";
 
     @Bean
-    public RestClientHttpServiceGroupConfigurer openMeteoGroupConfigurer() {
+    RestClientHttpServiceGroupConfigurer openMeteoGroupConfigurer() {
         return groups -> groups.filterByName(GROUP)
             .forEachClient((_, clientBuilder) ->
                 clientBuilder.defaultStatusHandler(HttpStatusCode::isError, (_, response) -> {

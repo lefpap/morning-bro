@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.discord;
+package io.github.lefpap.morningbro.notification;
 
 public class DiscordWebhookException extends RuntimeException {
 

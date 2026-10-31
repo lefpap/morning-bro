@@ -1,4 +1,4 @@
-package io.github.lefpap.morningbro.openmeteo;
+package io.github.lefpap.morningbro.weather;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
