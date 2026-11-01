@@ -49,7 +49,15 @@ class MorningBroPropertiesTest {
                 assertThat(properties.locations()).containsExactly(
                     new MorningBroProperties.Location("Athens", "GR", 37.98, 23.73),
                     new MorningBroProperties.Location("Brussels", "BE", 50.85, 4.35));
+                assertThat(properties.dryRun()).isFalse();
             });
+    }
+
+    @Test
+    void bindsDryRun() {
+        runner.withPropertyValues(VALID_PROPERTIES)
+            .withPropertyValues("morning-bro.dry-run=true")
+            .run(context -> assertThat(context.getBean(MorningBroProperties.class).dryRun()).isTrue());
     }
 
     @ParameterizedTest

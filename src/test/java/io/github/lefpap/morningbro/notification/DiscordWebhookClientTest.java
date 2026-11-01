@@ -40,12 +40,12 @@ class DiscordWebhookClientTest {
     @Test
     void postsContentAsJson() {
         server.expect(requestTo(URL))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.content").value("gm ☀️"))
-                .andRespond(withNoContent());
+            .andExpect(method(HttpMethod.POST))
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.content").value("gm ☀️"))
+            .andRespond(withNoContent());
 
-        client.postText("gm ☀️");
+        client.post(new DiscordMessage("gm ☀️"));
 
         server.verify();
     }
@@ -54,7 +54,7 @@ class DiscordWebhookClientTest {
     void non2xxThrowsWithoutWebhookUrl() {
         server.expect(requestTo(URL)).andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
 
-        Throwable thrown = catchThrowable(() -> client.postText("gm"));
+        Throwable thrown = catchThrowable(() -> client.post(new DiscordMessage("gm")));
 
         assertThat(thrown).isInstanceOf(DiscordWebhookException.class).hasNoCause();
         assertThat(thrown).hasMessageContaining("429");
@@ -65,7 +65,7 @@ class DiscordWebhookClientTest {
     void redirectThrowsInsteadOfPassingSilently() {
         server.expect(requestTo(URL)).andRespond(withStatus(HttpStatus.MOVED_PERMANENTLY));
 
-        Throwable thrown = catchThrowable(() -> client.postText("gm"));
+        Throwable thrown = catchThrowable(() -> client.post(new DiscordMessage("gm")));
 
         assertThat(thrown).isInstanceOf(DiscordWebhookException.class).hasMessageContaining("301");
     }
@@ -74,7 +74,7 @@ class DiscordWebhookClientTest {
     void ioErrorDoesNotLeakWebhookUrl() {
         server.expect(requestTo(URL)).andRespond(withException(new SocketTimeoutException()));
 
-        Throwable thrown = catchThrowable(() -> client.postText("gm"));
+        Throwable thrown = catchThrowable(() -> client.post(new DiscordMessage("gm")));
 
         assertThat(thrown).isInstanceOf(DiscordWebhookException.class).hasNoCause();
         assertThat(thrown.toString()).doesNotContain("secret-token");
