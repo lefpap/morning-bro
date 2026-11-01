@@ -25,7 +25,7 @@ The base package is `io.github.lefpap.morningbro`, organised by feature in a mod
 | `message` | `MorningMessageComposer`, `LocationWeather` | `CountryFlag` |
 | `notification` | `MessagePublisher` | `DiscordMessagePublisher`, `DiscordClientConfig`, `DiscordWebhookClient`, `DiscordMessage`, `DiscordWebhookException` |
 
-Dependencies point from the job to each feature's public API, and from `message` to `weather.Forecast` and the root `MorningBroProperties`. Nothing outside a package reaches its internal types.
+Dependencies point from the job to each feature's public API, and from `weather` and `message` (and the job itself) to the root `MorningBroProperties`; `message` also uses `weather.Forecast`. Nothing outside a package reaches its internal types.
 
 ```mermaid
 flowchart TB
@@ -49,6 +49,8 @@ flowchart TB
     Job --> WS
     Job --> MC
     Job --> MP
+    WS --> Props
+    Job --> Props
     MC --> FC
     LW --> FC
     MC --> Props
@@ -99,14 +101,15 @@ sequenceDiagram
 
 The HTTP clients are Spring HTTP interfaces in the service groups `discord` and `openmeteo` (`spring.http.serviceclient.*`). They share 5 s connect and 10 s read timeouts and the JDK HTTP client.
 
-Precedence, highest first: environment variables, then `.env`, then `application.yaml`. See the README config table for the key list.
+Precedence, highest first: environment variables, then `.env`, then `application.yaml`. See the [README config table](../README.md#configuration) for the key list.
 
 ## Failure handling
 
 | Failure | Result | Exit code |
 |---|---|---|
-| One location's weather fails (HTTP error, timeout, bad data) | That location shows the "day off" line; WARN log | 0 |
-| All weather fails | Greeting only | 0 |
+| One location's weather fails (HTTP error, timeout, undecodable response) | That location shows the "day off" line; WARN log | 0 |
+| One location's response has missing values | Same "day off" line; logged at INFO as `Forecast for X: N/A`, no WARN | 0 |
+| All weather fails | Header without the weather emoji; every location shows the `(weather is taking the day off)` line | 0 |
 | Invalid config | Startup error | non-zero |
 | Webhook URL missing on a real run | `Discord webhook URL is not set: …` at startup, before any weather call | non-zero |
 | Discord non-2xx (including 3xx, since redirects aren't followed) or I/O error | `DiscordWebhookException` | non-zero |
@@ -124,19 +127,20 @@ Both use `contents: read`, `persist-credentials: false`, a 10-minute timeout, an
 
 ## Testing
 
-`./mvnw test` never hits the network (`MockRestServiceServer`, with closed local ports as a backstop) and never runs the job (`morning-bro.run-on-startup=false`). Fixed UTC clocks prove the zone logic.
+`./mvnw test` never hits the network (`MockRestServiceServer`, with closed local ports as a backstop) and never starts the job on application startup (`morning-bro.run-on-startup=false`). Fixed UTC clocks prove the zone logic.
 
 - `MorningBroPropertiesTest`: every validation rule.
 - `OpenMeteoClientTest`, `DiscordWebhookClientTest`: request shape, error mapping, no URL leaks.
 - `ForecastConverterTest`, `WeatherEmojiTest`, `WeatherServiceTest`: conversion, rounding, emoji, zone.
 - `MorningMessageComposerTest`, `CountryFlagTest`: message layout and flags.
 - `MorningBroJobTest`: failure isolation, dry run, final log line.
+- `MorningBroApplicationTests`: the context loads with the real configuration.
 - `DiscordClientConfigTest`: the beans that exist on a real run versus a dry run, and the missing-URL failure.
 
 ## Design decisions
 
 - **One Open-Meteo request per location.** A failure affects one location only, and batched responses change shape (a list instead of an object).
-- **No retries.** Each external call is attempted once. This is a deliberate v1 simplification (the user's decision); failures are handled by the rules in Failure handling.
+- **No retries.** Each external call is attempted once. This is a deliberate v1 simplification (the owner's decision); failures are handled by the rules in Failure handling.
 - **A dry run removes the Discord beans entirely**, so no webhook URL is needed. Rejected: a logging publisher (it isn't a publisher) and `Optional<MessagePublisher>` (an Optional parameter needing an unreachable guard).
 - **Half-up rounding to `int`.** Ties round away from zero, and an `int` result can't be negative zero.
 - **`Locale.ROOT` formatting.** Digits and minus signs are the same whatever the host's default locale.
@@ -147,6 +151,6 @@ Both use `contents: read`, `persist-credentials: false`, a 10-minute timeout, an
 
 Not built; ideas only.
 
-- A keep-alive workflow, since GitHub disables scheduled workflows after 60 days without repository activity.
+- A keep-alive workflow, since GitHub disables scheduled workflows on public repositories after 60 days without activity (see [known limits](product.md#known-limits)).
 - A move to Cloud Scheduler plus a Cloud Run Job, if GitHub's schedule proves unreliable.
 - A softer emoji when the rain chance is low.

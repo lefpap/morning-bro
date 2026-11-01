@@ -22,12 +22,12 @@ Good Morning — Καλημέρα! ☕⛅ Take it easy Friday! 😎
 
 The rules:
 
-- The header is the morning text followed directly (no space) by the home location's weather emoji. On Fridays only, the Friday text is added after it.
+- The header is the morning text followed directly (no space) by the home location's weather emoji. On Fridays only, the Friday text is added after it, following a single space.
 - There is one block per location, in the order they are configured: the country flag, the location name, then a line of `{emoji} · {min}°–{max}° · 💧 {rain}%`.
 - Temperatures are in °C, rounded half-up. Rain is the day's highest precipitation probability.
 - If a location's weather can't be fetched, its block shows `(weather is taking the day off)` instead of the weather line.
 - If the home location's weather fails, the header simply has no emoji.
-- "Today" and "Friday" are decided in the configured time zone (Europe/Athens), not UTC.
+- "Today" and "Friday" are decided in the configured time zone (Europe/Athens by default), not UTC.
 
 ## Weather emoji
 
@@ -52,7 +52,7 @@ Accepted quirk: the daily code is the day's most severe condition, so a line lik
 - The greeting always goes out, even if some or all of the weather fails.
 - Each external call is tried once. There are no retries.
 - Late and manual runs always post. A manual re-send plus a late scheduled run can therefore post twice, and that is accepted.
-- A Discord failure fails the run, so GitHub emails the repository owner.
+- A Discord failure fails the run, so GitHub emails whoever last edited the schedule (scheduled runs) or triggered the run (manual runs), which here is the owner.
 - The webhook URL never appears in logs or error messages.
 
 ## What it doesn't do

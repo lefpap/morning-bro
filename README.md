@@ -33,13 +33,14 @@ GitHub Actions starts the app at 07:50 Europe/Athens. It fetches each location's
 
 ## Setup
 
-1. Create a webhook: Discord channel, *Edit Channel*, *Integrations*, *Webhooks*, *New Webhook*, *Copy Webhook URL*. It looks like `https://discord.com/api/webhooks/<id>/<token>`. Treat the URL as a password.
-2. Local: `cp .env.example .env` and fill in `MORNING_BRO_DISCORD_WEBHOOK_URL`. `.env` is gitignored, and real environment variables override it.
-3. GitHub: `gh secret set MORNING_BRO_DISCORD_WEBHOOK_URL`. It prompts for the value, so the URL never lands in your shell history.
+1. Clone the repo: `gh repo clone lefpap/morning-bro`, then `cd morning-bro`.
+2. Create a webhook: Discord channel, *Edit Channel*, *Integrations*, *Webhooks*, *New Webhook*, *Copy Webhook URL*. It looks like `https://discord.com/api/webhooks/<id>/<token>`. Treat the URL as a password.
+3. Local: `cp .env.example .env` and fill in `MORNING_BRO_DISCORD_WEBHOOK_URL`. `.env` is gitignored, and real environment variables override it.
+4. GitHub: `gh secret set MORNING_BRO_DISCORD_WEBHOOK_URL`. It prompts for the value, so the URL never lands in your shell history.
 
 ## Configuration
 
-Everything lives in `src/main/resources/application.yaml`.
+Everything except run-on-startup lives in `src/main/resources/application.yaml`.
 
 | Key | What it does | Default | Env var |
 |---|---|---|---|
@@ -60,6 +61,7 @@ To add a location, append an entry to the list:
 ```yaml
 morning-bro:
   locations:
+    # …existing locations
     - name: Berlin
       country-code: DE
       latitude: 52.52
@@ -97,16 +99,16 @@ java -jar target/morning-bro-0.0.1-SNAPSHOT.jar
 ./mvnw test
 ```
 
-Tests never touch the network and never run the job. CI runs `./mvnw verify` on every push and PR to `master`.
+Tests never touch the network and never start the job on application startup. CI runs `./mvnw verify` on every push and PR to `master`.
 
 ## Operating it
 
-- Schedule: daily at 07:50 Europe/Athens (`.github/workflows/morning-bro.yml`).
+- Schedule: daily at 07:50 Europe/Athens (`.github/workflows/morning-bro.yml`; see [scheduling](docs/architecture.md#scheduling)).
 - Manual dry run: `gh workflow run morning-bro.yml`
 - Manual real post (e.g. a re-send after an outage): `gh workflow run morning-bro.yml -f dry_run=false`
 - Watch and inspect: `gh run list --workflow morning-bro.yml`, `gh run watch`, `gh run view <run-id> --log`
 - Scheduled runs only: `gh run list --workflow morning-bro.yml --event schedule`
-- Failures: a failed run emails the repo owner (GitHub's default notification); the log says why.
+- Failures: a failed run emails whoever last edited the schedule (scheduled runs) or triggered the run (manual runs), which here is the owner (GitHub's default notification); the log says why.
 - Known limits: see [docs/product.md](docs/product.md#known-limits). Also, if the repo is public and GitHub disables the schedule after 60 days of inactivity, re-enable it with `gh workflow enable morning-bro.yml`.
 
 ## Project layout
