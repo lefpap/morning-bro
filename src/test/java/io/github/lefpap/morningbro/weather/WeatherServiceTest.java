@@ -18,7 +18,7 @@ class WeatherServiceTest {
     private static final ZoneId ZONE = ZoneId.of("Europe/Athens");
     private static final Location ATHENS = new Location("Athens", "GR", 37.98, 23.73);
     private static final MorningBroProperties PROPERTIES = new MorningBroProperties(
-        ZONE, "Athens", new MorningBroProperties.Message("Good Morning", "Take it easy Friday!"), List.of(ATHENS));
+        ZONE, "Athens", new MorningBroProperties.Message("Good Morning", "Take it easy Friday!"), List.of(ATHENS), false);
 
     private static final OpenMeteoForecast CLOUDY_DAY = new OpenMeteoForecast(new OpenMeteoForecast.Daily(
         List.of(LocalDate.of(2026, 10, 30)), List.of(3), List.of(21.4), List.of(15.2), List.of(25)));

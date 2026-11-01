@@ -31,7 +31,7 @@ class MorningMessageComposerTest {
         ZoneId.of("Europe/Athens"),
         "Athens",
         new MorningBroProperties.Message("Good Morning — Καλημέρα! ☕", "Take it easy Friday! 😎"),
-        List.of(ATHENS, IKARIA, BRUSSELS, MILAN));
+        List.of(ATHENS, IKARIA, BRUSSELS, MILAN), false);
 
     private static final String LOCATION_BLOCKS = """
         🇬🇷 Athens

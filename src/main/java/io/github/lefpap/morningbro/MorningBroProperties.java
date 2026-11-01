@@ -20,7 +20,8 @@ public record MorningBroProperties(
         @NotNull ZoneId timeZone,
         @NotBlank String home,
         @NotNull @Valid Message message,
-        @NotEmpty List<@Valid Location> locations) {
+        @NotEmpty List<@Valid Location> locations,
+        boolean dryRun) {
 
     public record Message(
             @NotBlank String morning,

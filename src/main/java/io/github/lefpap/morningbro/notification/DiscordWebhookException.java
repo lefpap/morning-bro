@@ -1,8 +1,8 @@
 package io.github.lefpap.morningbro.notification;
 
-public class DiscordWebhookException extends RuntimeException {
+class DiscordWebhookException extends RuntimeException {
 
-    public DiscordWebhookException(String message) {
+    DiscordWebhookException(String message) {
         super(message);
     }
 
