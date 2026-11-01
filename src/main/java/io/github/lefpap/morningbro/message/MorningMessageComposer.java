@@ -12,6 +12,9 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Builds the morning message text. It is pure: it takes "today" as an argument and never reads the clock.
+ */
 @Component
 @RequiredArgsConstructor
 public class MorningMessageComposer {
@@ -21,7 +24,9 @@ public class MorningMessageComposer {
 
     private final MorningBroProperties properties;
 
-    // The full message for today: a greeting, then one block per location in the given order.
+    /**
+     * The full message for today: a greeting, then one block per location in the given order.
+     */
     public String compose(LocalDate today, List<LocationWeather> weather) {
         Stream<String> blocks = weather.stream().map(MorningMessageComposer::locationBlock);
         String header = header(today, weather);
@@ -55,7 +60,6 @@ public class MorningMessageComposer {
     private static boolean isFriday(LocalDate date) {
         return DayOfWeek.FRIDAY.equals(date.getDayOfWeek());
     }
-
 
     // Locale.ROOT keeps ASCII digits and minus sign whatever the JVM's default locale.
     private static String weatherLine(Forecast forecast) {

@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.stereotype.Component;
 
-// Exists only on a real run: a dry run has no Discord client (see DiscordClientConfig).
+/**
+ * Posts the morning message to the Discord webhook. It exists only on a real run, because a dry run has no
+ * Discord client (see {@link DiscordClientConfig}).
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

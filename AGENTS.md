@@ -9,6 +9,14 @@ A run-once Spring Boot app (Java 27, Maven wrapper) that posts a daily "good mor
 - Build and test: `./mvnw test`
 - Local dry run (logs the message, posts nothing): `MORNING_BRO_DRY_RUN=true ./mvnw spring-boot:run`
 
+## Docs
+
+Read the relevant doc before changing code, and update it when behavior changes.
+
+- [README.md](README.md): setup, configuration, running and operating it.
+- [docs/product.md](docs/product.md): what it does and the message rules.
+- [docs/architecture.md](docs/architecture.md): packages, failure handling, scheduling, testing and design decisions.
+
 ## Git and GitHub
 
 - Use the `gh` CLI for all GitHub operations: repos, branches on the remote, pull requests, workflow runs, and secrets.

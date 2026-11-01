@@ -1,7 +1,9 @@
 package io.github.lefpap.morningbro.weather;
 
-// Emoji for WMO weather codes, as returned in Open-Meteo's daily weather_code.
-// Escaped so the variation selector (U+FE0F) is visible: every emoji but ⛅ carries one.
+/**
+ * Emoji for WMO weather codes, as returned in Open-Meteo's daily {@code weather_code}.
+ * Escaped so the variation selector (U+FE0F) is visible: every emoji but ⛅ carries one.
+ */
 final class WeatherEmoji {
 
     static final String SUN = "\u2600\uFE0F";

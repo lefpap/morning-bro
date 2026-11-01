@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * The slice of Open-Meteo's forecast response that Morning Bro uses.
+ */
 record OpenMeteoForecast(Daily daily) {
 
     record Daily(

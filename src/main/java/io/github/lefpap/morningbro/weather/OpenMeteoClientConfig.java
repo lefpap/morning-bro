@@ -9,6 +9,9 @@ import org.springframework.web.service.registry.ImportHttpServices;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Registers the {@code openmeteo} service group and turns error statuses into {@link OpenMeteoException}.
+ */
 @Configuration(proxyBeanMethods = false)
 @ImportHttpServices(group = OpenMeteoClientConfig.GROUP, types = OpenMeteoClient.class)
 class OpenMeteoClientConfig {

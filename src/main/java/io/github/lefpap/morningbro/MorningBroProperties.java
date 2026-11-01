@@ -14,6 +14,9 @@ import org.springframework.validation.annotation.Validated;
 import java.time.ZoneId;
 import java.util.List;
 
+/**
+ * The validated {@code morning-bro.*} settings, so bad configuration fails at startup.
+ */
 @Validated
 @ConfigurationProperties("morning-bro")
 public record MorningBroProperties(
@@ -23,11 +26,17 @@ public record MorningBroProperties(
         @NotEmpty List<@Valid Location> locations,
         boolean dryRun) {
 
+    /**
+     * The greeting texts.
+     */
     public record Message(
             @NotBlank String morning,
             @NotBlank String friday) {
     }
 
+    /**
+     * A place to report weather for, with the coordinates used to fetch it.
+     */
     public record Location(
             @NotBlank String name,
             @NotNull @Pattern(regexp = "[A-Z]{2}") String countryCode,
@@ -35,7 +44,9 @@ public record MorningBroProperties(
             @NotNull @DecimalMin("-180") @DecimalMax("180") Double longitude) {
     }
 
-    // Location names identify locations (home-location refers to one), so they must be unique.
+    /**
+     * Location names identify locations ({@code home} refers to one), so they must be unique.
+     */
     @AssertTrue(message = "location names must be unique")
     public boolean isLocationNamesUnique() {
         if (locations == null) {
@@ -44,7 +55,9 @@ public record MorningBroProperties(
         return locations.stream().map(Location::name).distinct().count() == locations.size();
     }
 
-    // home must name a location exactly (case-sensitive), so a typo fails startup instead of dropping the header emoji.
+    /**
+     * {@code home} must name a location exactly (case-sensitive), so a typo fails startup instead of dropping the header emoji.
+     */
     @AssertTrue(message = "home must match the name of one of the locations")
     public boolean isHomeKnown() {
         if (home == null || locations == null) {
