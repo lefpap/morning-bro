@@ -1,0 +1,43 @@
+name: Morning Bro
+
+on:
+  schedule:
+    - cron: '50 7 * * *'
+      timezone: "Europe/Athens"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Log the message instead of posting it
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '27'
+          cache: maven
+
+      - name: Build
+        run: ./mvnw -B -ntp -DskipTests package
+
+      - name: Post morning message
+        env:
+          MORNING_BRO_DISCORD_WEBHOOK_URL: ${{ secrets.MORNING_BRO_DISCORD_WEBHOOK_URL }}
+          MORNING_BRO_DRY_RUN: ${{ inputs.dry_run == true }}
+        run: java -jar target/morning-bro-*.jar
