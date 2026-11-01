@@ -25,7 +25,7 @@ The base package is `io.github.lefpap.morningbro`, organised by feature in a mod
 | `message` | `MorningMessageComposer`, `LocationWeather` | `CountryFlag` |
 | `notification` | `MessagePublisher` | `DiscordMessagePublisher`, `DiscordClientConfig`, `DiscordWebhookClient`, `DiscordMessage`, `DiscordWebhookException` |
 
-Dependencies point from the job to each feature's public API, and from `message` to `weather.Forecast`. Nothing outside a package reaches its internal types.
+Dependencies point from the job to each feature's public API, and from `message` to `weather.Forecast` and the root `MorningBroProperties`. Nothing outside a package reaches its internal types.
 
 ```mermaid
 flowchart TB
@@ -51,6 +51,8 @@ flowchart TB
     Job --> MP
     MC --> FC
     LW --> FC
+    MC --> Props
+    LW --> Props
 ```
 
 Dotted arrows stay inside their package: the public type is the only way in.
@@ -134,9 +136,9 @@ Both use `contents: read`, `persist-credentials: false`, a 10-minute timeout, an
 ## Design decisions
 
 - **One Open-Meteo request per location.** A failure affects one location only, and batched responses change shape (a list instead of an object).
-- **No retries.** The job runs daily and a partial message is acceptable; a retry would add delay and state for little gain.
-- **A dry run removes the Discord beans entirely**, so no webhook URL is needed. Rejected: a logging publisher, and `Optional<MessagePublisher>`; both leave Discord wiring in a run that must not touch it.
-- **Half-up rounding to `int`.** Whole degrees read better in a chat message, and it avoids negative zero.
+- **No retries.** Each external call is attempted once. This is a deliberate v1 simplification (the user's decision); failures are handled by the rules in Failure handling.
+- **A dry run removes the Discord beans entirely**, so no webhook URL is needed. Rejected: a logging publisher (it isn't a publisher) and `Optional<MessagePublisher>` (an Optional parameter needing an unreachable guard).
+- **Half-up rounding to `int`.** Ties round away from zero, and an `int` result can't be negative zero.
 - **`Locale.ROOT` formatting.** Digits and minus signs are the same whatever the host's default locale.
 - **Layout in code, not templates.** The message is a few lines; a template engine would be more machinery than the format.
 - **No client-side 2000-character check.** Discord's rejection is already a clear failure.
