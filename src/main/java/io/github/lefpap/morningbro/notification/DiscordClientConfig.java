@@ -13,7 +13,8 @@ import org.springframework.web.service.registry.ImportHttpServices;
 import java.io.IOException;
 
 /**
- * The Discord client exists only on a real run, so a dry run needs no webhook URL.
+ * Registers the Discord webhook client and fails fast on a missing URL.
+ * The client exists only on a real run, so a dry run needs no webhook URL.
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBooleanProperty(name = "morning-bro.dry-run", havingValue = false, matchIfMissing = true)
