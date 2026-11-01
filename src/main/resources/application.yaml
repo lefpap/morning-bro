@@ -2,6 +2,10 @@ spring:
   application:
     name: morning-bro
 
+  # Local secrets (gitignored). Its values override this file; real environment variables override both.
+  config:
+    import: optional:file:.env[.properties][encoding=utf-8]
+
   main:
     web-application-type: none
     banner-mode: off
@@ -22,6 +26,7 @@ spring:
         base-url: https://api.open-meteo.com
 
 morning-bro:
+  dry-run: ${MORNING_BRO_DRY_RUN:false}
   time-zone: Europe/Athens
   home: Athens
   message:

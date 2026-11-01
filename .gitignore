@@ -34,3 +34,6 @@ build/
 
 ### Superpowers brainstorming ###
 .superpowers/
+
+### Local secrets ###
+.env
