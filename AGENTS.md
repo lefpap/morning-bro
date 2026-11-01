@@ -8,6 +8,7 @@ A run-once Spring Boot app (Java 27, Maven wrapper) that posts a daily "good mor
 
 - Build and test: `./mvnw test`
 - Local dry run (logs the message, posts nothing): `MORNING_BRO_DRY_RUN=true ./mvnw spring-boot:run`
+- Docs: product rules in docs/product.md, structure and design decisions in docs/architecture.md. Keep them in sync when behavior changes.
 
 ## Git and GitHub
 
