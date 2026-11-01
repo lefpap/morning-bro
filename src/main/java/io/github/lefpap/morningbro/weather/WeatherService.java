@@ -18,7 +18,7 @@ public class WeatherService {
 
     /**
      * Today's forecast in the configured zone, or empty when Open-Meteo has no data for it.
-     * Client failures propagate as {@link OpenMeteoException} or {@code RestClientException}.
+     * Client failures propagate as a {@code RestClientException}.
      */
     public Optional<Forecast> today(MorningBroProperties.Location location) {
         OpenMeteoForecast response = openMeteo.today(location.latitude(), location.longitude(), properties.timeZone());
