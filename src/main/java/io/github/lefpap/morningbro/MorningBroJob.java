@@ -19,6 +19,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The whole run: fetches each location's weather, composes the message, then posts it or, on a dry run, logs it.
+ * Disabled by {@code morning-bro.run-on-startup=false}.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

@@ -6,10 +6,15 @@ import org.springframework.web.service.annotation.HttpExchange;
 
 import java.time.ZoneId;
 
+/**
+ * HTTP interface for Open-Meteo's forecast API: one day of daily fields per call.
+ */
 @HttpExchange
 interface OpenMeteoClient {
 
-    // Must match the fields of OpenMeteoForecast.Daily.
+    /**
+     * Must match the fields of {@link OpenMeteoForecast.Daily}.
+     */
     String DAILY_FIELDS = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max";
 
     @GetExchange("/v1/forecast?daily=" + DAILY_FIELDS + "&forecast_days=1")

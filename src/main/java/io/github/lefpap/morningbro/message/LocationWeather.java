@@ -5,6 +5,8 @@ import io.github.lefpap.morningbro.weather.Forecast;
 
 import java.util.Optional;
 
-// One location's weather for today; an empty forecast means the weather is unavailable.
+/**
+ * One location's weather for today; an empty {@code forecast} means the weather is unavailable.
+ */
 public record LocationWeather(MorningBroProperties.Location location, Optional<Forecast> forecast) {
 }

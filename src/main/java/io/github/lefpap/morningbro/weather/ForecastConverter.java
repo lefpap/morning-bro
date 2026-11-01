@@ -8,12 +8,17 @@ import java.util.Optional;
 
 import static org.springframework.util.CollectionUtils.firstElement;
 
+/**
+ * Turns an {@link OpenMeteoForecast} into a {@link Forecast}.
+ */
 final class ForecastConverter {
 
     private ForecastConverter() {
     }
 
-    // Reads the first day (the request asks for exactly one). Any missing value means no forecast at all.
+    /**
+     * Reads the first day (the request asks for exactly one). Any missing value means no forecast at all.
+     */
     static Optional<Forecast> convert(@Nullable OpenMeteoForecast response) {
         if (response == null || response.daily() == null) {
             return Optional.empty();

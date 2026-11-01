@@ -12,13 +12,17 @@ import org.springframework.web.service.registry.ImportHttpServices;
 
 import java.io.IOException;
 
-// The Discord client exists only on a real run, so a dry run needs no webhook URL.
+/**
+ * The Discord client exists only on a real run, so a dry run needs no webhook URL.
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBooleanProperty(name = "morning-bro.dry-run", havingValue = false, matchIfMissing = true)
 @ImportHttpServices(group = DiscordClientConfig.GROUP, types = DiscordWebhookClient.class)
 class DiscordClientConfig {
 
-    // Group settings are under spring.http.serviceclient.discord in application.yaml.
+    /**
+     * Group settings are under {@code spring.http.serviceclient.discord} in {@code application.yaml}.
+     */
     static final String GROUP = "discord";
 
     // Without this check a missing URL only shows up at post time, after all the weather calls.
