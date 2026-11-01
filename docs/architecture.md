@@ -8,10 +8,11 @@ Nothing in the code depends on GitHub Actions: configuration comes from `applica
 
 ```mermaid
 flowchart LR
-    GHA["GitHub Actions<br/>schedule or workflow_dispatch"] -->|"java -jar"| MB["Morning Bro"]
-    MB -->|"one GET per location"| OM["Open-Meteo API"]
-    MB -->|"one POST"| DC["Discord webhook"]
-    MB -.->|"dry run: logs instead"| LOG["Log output"]
+    GHA["⏰ GitHub Actions<br/>scheduled workflow"] -->|starts| MB["☕ Morning Bro<br/>Java app"]
+    MB -->|"1 · GET today's forecast<br/>(one request per location)"| OM["⛅ Open-Meteo<br/>API"]
+    MB -->|"2 · POST message"| DC["💬 Discord<br/>webhook"]
+    DC --> CH["#channel"]
+    MB -.->|"dry run: logs instead"| LOG["📝 Log output"]
 ```
 
 ## Packages
@@ -21,74 +22,19 @@ The base package is `io.github.lefpap.morningbro`, organised by feature in a mod
 | Package | Public API | Internal |
 |---|---|---|
 | root | `MorningBroApplication`, `MorningBroJob`, `MorningBroProperties` | – |
-| `weather` | `WeatherService`, `Forecast`, `OpenMeteoException` | `OpenMeteoClient`, `OpenMeteoClientConfig`, `OpenMeteoForecast`, `ForecastConverter`, `WeatherEmoji` |
+| `weather` | `WeatherService`, `Forecast` | `OpenMeteoClient`, `OpenMeteoClientConfig`, `OpenMeteoException`, `OpenMeteoForecast`, `ForecastConverter`, `WeatherEmoji` |
 | `message` | `MorningMessageComposer`, `LocationWeather` | `CountryFlag` |
 | `notification` | `MessagePublisher` | `DiscordMessagePublisher`, `DiscordClientConfig`, `DiscordWebhookClient`, `DiscordMessage`, `DiscordWebhookException` |
 
 Dependencies point from the job to each feature's public API, and from `weather` and `message` (and the job itself) to the root `MorningBroProperties`; `message` also uses `weather.Forecast`. Nothing outside a package reaches its internal types.
 
-```mermaid
-flowchart TB
-    subgraph root["morningbro"]
-        Job["MorningBroJob"]
-        Props["MorningBroProperties"]
-    end
-    subgraph weather["weather"]
-        WS["WeatherService"]
-        FC["Forecast"]
-        WS -.-> OMC["OpenMeteoClient, ForecastConverter, ..."]
-    end
-    subgraph message["message"]
-        MC["MorningMessageComposer"]
-        LW["LocationWeather"]
-    end
-    subgraph notification["notification"]
-        MP["MessagePublisher"]
-        MP -.-> DMP["DiscordMessagePublisher, ..."]
-    end
-    Job --> WS
-    Job --> MC
-    Job --> MP
-    WS --> Props
-    Job --> Props
-    MC --> FC
-    LW --> FC
-    MC --> Props
-    LW --> Props
-```
-
-Dotted arrows stay inside their package: the public type is the only way in.
-
 ## A run step by step
 
-```mermaid
-sequenceDiagram
-    participant Job as MorningBroJob
-    participant WS as WeatherService
-    participant OM as Open-Meteo
-    participant MC as MorningMessageComposer
-    participant MP as MessagePublisher
-    participant DC as Discord
-    loop each of M locations
-        Job->>WS: today(location)
-        WS->>OM: GET forecast
-        alt request fails
-            Job->>Job: WARN log, no forecast
-        else ok
-            OM-->>WS: forecast
-            WS-->>Job: Forecast
-        end
-    end
-    Job->>MC: compose(today, weather)
-    MC-->>Job: message
-    alt dry run
-        Job->>Job: log the message
-    else real run
-        Job->>MP: publish(message)
-        MP->>DC: POST
-    end
-    Job->>Job: log "with weather for N of M locations"
-```
+1. The job works out today's date in the configured time zone.
+2. For each location, in order, it asks `WeatherService` for today's forecast. A failed request logs a WARN and leaves that location without a forecast.
+3. `MorningMessageComposer` builds the message from the date and the forecasts.
+4. On a dry run the job logs the message; otherwise it hands it to `MessagePublisher`, which POSTs it to the Discord webhook.
+5. The job logs `with weather for N of M locations` and exits.
 
 - "Today" is `LocalDate.ofInstant(clock.instant(), timeZone)`. The injected `Clock` is UTC; the configured zone is applied by the job, never by the JVM default.
 - `MorningMessageComposer` is pure: it never reads the clock, so the same inputs always give the same message.
