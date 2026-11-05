@@ -51,8 +51,9 @@ Accepted quirk: the daily code is the day's most severe condition, so a line lik
 
 - The greeting always goes out, even if some or all of the weather fails.
 - Each external call is tried once. There are no retries.
-- Late and manual runs always post. A manual re-send plus a late scheduled run can therefore post twice, and that is accepted.
-- A Discord failure fails the run, so GitHub emails whoever last edited the schedule (scheduled runs) or triggered the run (manual runs), which here is the owner.
+- Late and manual runs always post. A manual re-send on a day the daily trigger also fired posts twice, and that is accepted.
+- If the daily trigger can't start the run (for example, an expired token), cron-job.org emails the owner.
+- A Discord failure fails the run, so GitHub emails whoever triggered it, which is the owner.
 - The webhook URL never appears in logs or error messages.
 
 ## What it doesn't do
@@ -65,8 +66,8 @@ Accepted quirk: the daily code is the day's most severe condition, so a line lik
 
 ## Known limits
 
-- GitHub may delay or skip a scheduled run, with no email.
-- On public repositories, GitHub disables scheduled workflows after 60 days without activity. This is not relevant while the repository is private.
+- The daily trigger comes from cron-job.org, a free service with no punctuality guarantee and no retries. If it misses a morning, the message can be re-sent by hand.
+- The trigger's GitHub token has an expiry date; after it, runs stop until the token is rotated (cron-job.org emails on the first failure).
 - Discord rejects messages over 2000 characters. That fails the run instead of truncating the message.
 
 ## Changing it

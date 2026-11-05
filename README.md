@@ -22,7 +22,7 @@ Good Morning — Καλημέρα! ☕⛅ Take it easy Friday! 😎
 
 ## How it works
 
-GitHub Actions starts the app at 07:50 Europe/Athens. It fetches each location's forecast from Open-Meteo and posts one message to a Discord webhook. Then it exits. See the [architecture overview](docs/architecture.md#overview).
+At 07:50 Europe/Athens a [cron-job.org](https://cron-job.org) job starts the GitHub Actions workflow, which runs the app. It fetches each location's forecast from Open-Meteo and posts one message to a Discord webhook. Then it exits. See the [architecture overview](docs/architecture.md#overview).
 
 ## Requirements
 
@@ -37,6 +37,7 @@ GitHub Actions starts the app at 07:50 Europe/Athens. It fetches each location's
 2. Create a webhook: Discord channel, *Edit Channel*, *Integrations*, *Webhooks*, *New Webhook*, *Copy Webhook URL*. It looks like `https://discord.com/api/webhooks/<id>/<token>`. Treat the URL as a password.
 3. Local: `cp .env.example .env` and fill in `MORNING_BRO_DISCORD_WEBHOOK_URL`. `.env` is gitignored, and real environment variables override it.
 4. GitHub: `gh secret set MORNING_BRO_DISCORD_WEBHOOK_URL`. It prompts for the value, so the URL never lands in your shell history.
+5. Daily trigger: see [Daily trigger (cron-job.org)](#daily-trigger-cron-joborg).
 
 ## Configuration
 
@@ -103,13 +104,31 @@ Tests never touch the network and never start the job on application startup. CI
 
 ## Operating it
 
-- Schedule: daily at 07:50 Europe/Athens (`.github/workflows/morning-bro.yml`; see [scheduling](docs/architecture.md#scheduling)).
+- Schedule: daily at 07:50 Europe/Athens, triggered by cron-job.org (see [Daily trigger](#daily-trigger-cron-joborg) and [scheduling](docs/architecture.md#scheduling)).
 - Manual dry run: `gh workflow run morning-bro.yml`
 - Manual real post (e.g. a re-send after an outage): `gh workflow run morning-bro.yml -f dry_run=false`
 - Watch and inspect: `gh run list --workflow morning-bro.yml`, `gh run watch`, `gh run view <run-id> --log`
-- Scheduled runs only: `gh run list --workflow morning-bro.yml --event schedule`
-- Failures: a failed run emails whoever last edited the schedule (scheduled runs) or triggered the run (manual runs), which here is the owner (GitHub's default notification); the log says why.
-- Known limits: see [docs/product.md](docs/product.md#known-limits). Also, if the repo is public and GitHub disables the schedule after 60 days of inactivity, re-enable it with `gh workflow enable morning-bro.yml`.
+- Failures: if the trigger call fails (expired token, GitHub down), cron-job.org emails the owner. If the run itself fails, GitHub emails whoever triggered it, which is the token's owner; the log says why.
+- Known limits: see [docs/product.md](docs/product.md#known-limits).
+
+### Daily trigger (cron-job.org)
+
+A free [cron-job.org](https://cron-job.org) job calls GitHub's [workflow dispatch API](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event) every day.
+
+| Setting | Value |
+|---|---|
+| URL | `https://api.github.com/repos/lefpap/morning-bro/actions/workflows/morning-bro.yml/dispatches` |
+| Schedule | Every day at 07:50, time zone `Europe/Athens` (follows daylight saving time) |
+| Method | `POST` |
+| Headers | `Authorization: Bearer <token>`, `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`, `Content-Type: application/json` |
+| Body | `{"ref":"master","inputs":{"dry_run":"false"}}` |
+| Notifications | On failure (after 1), on success after failure, on auto-disable |
+
+The body must say `"dry_run":"false"`; a missing input falls back to the workflow default, a dry run. *Test run* in cron-job.org should return `204 No Content`, and the run then appears in `gh run list --workflow morning-bro.yml --event workflow_dispatch`.
+
+The token is a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) limited to this repository with the **Actions: Read and write** permission and nothing else (Metadata: Read-only is added automatically). It lives only in the cron-job.org job.
+
+To rotate it (before it expires, or if it leaks): generate a new token with the same settings, replace the `Authorization` header value in the cron-job.org job, click *Test run*, then delete the old token on GitHub. GitHub's response header `github-authentication-token-expiration` shows the current token's expiry. API version `2022-11-28` stops working on 2028-03-10; update the header before then.
 
 ## Project layout
 
@@ -119,7 +138,7 @@ src/main/java/io/github/lefpap/morningbro/
   message/         builds the Discord message text
   notification/    Discord webhook client and publisher
 src/main/resources/application.yaml   all configuration
-.github/workflows/                    morning-bro.yml (schedule), ci.yml
+.github/workflows/                    morning-bro.yml (daily run), ci.yml
 docs/                                 product.md, architecture.md
 ```
 

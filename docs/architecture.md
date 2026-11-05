@@ -8,7 +8,8 @@ Nothing in the code depends on GitHub Actions: configuration comes from `applica
 
 ```mermaid
 flowchart LR
-    GHA["⏰ GitHub Actions<br/>scheduled workflow"] -->|starts| MB["☕ Morning Bro<br/>Java app"]
+    CRON["⏰ cron-job.org<br/>07:50 Europe/Athens"] -->|"POST workflow_dispatch"| GHA["⚙️ GitHub Actions<br/>workflow"]
+    GHA -->|starts| MB["☕ Morning Bro<br/>Java app"]
     MB -->|"1 · GET today's forecast<br/>(one request per location)"| OM["⛅ Open-Meteo<br/>API"]
     MB -->|"2 · POST message"| DC["💬 Discord<br/>webhook"]
     DC --> CH["#channel"]
@@ -66,8 +67,10 @@ Precedence, highest first: environment variables, then `.env`, then `application
 
 Two workflows live in `.github/workflows/`.
 
-- **Morning Bro** (`morning-bro.yml`): runs on cron `50 7 * * *` with `timezone: "Europe/Athens"`, so it follows daylight saving time. 07:50 avoids the busy start of the hour. It can also be started with `workflow_dispatch`, whose `dry_run` input defaults to `true`. It builds with `-DskipTests` (CI already tested the commit) and runs `java -jar target/morning-bro-*.jar`. Its concurrency group does not cancel, so overlapping runs queue.
+- **Morning Bro** (`morning-bro.yml`): runs only on `workflow_dispatch`, whose `dry_run` input defaults to `true`. An external [cron-job.org](https://cron-job.org) job calls the dispatch API every day at 07:50 `Europe/Athens` (so it follows daylight saving time) with `dry_run=false`, authenticated by a fine-grained token limited to this repo with Actions: write. Setup and token rotation are in the [README](../README.md#daily-trigger-cron-joborg). It builds with `-DskipTests` (CI already tested the commit) and runs `java -jar target/morning-bro-*.jar`. Its concurrency group does not cancel, so overlapping runs queue.
 - **CI** (`ci.yml`): runs `./mvnw verify` on pushes and PRs to `master`. It uses no secrets and cancels stale runs.
+
+**Why not GitHub's `schedule` event.** It was used first (`50 7 * * *`, `timezone: "Europe/Athens"`), but in its first week GitHub created the runs 7–8 hours late (13:02–13:52 UTC against 05:50 UTC). GitHub only says scheduled runs "can be delayed during periods of high loads" and may be dropped. Dispatched runs start within seconds. cron-job.org was chosen because it is free with no card, supports a per-job IANA time zone, and can send the POST with headers and a body. Its trade-offs: no documented punctuality guarantee or retries, and the token is stored by a third party. Runners-up were a Cloudflare Workers cron trigger (UTC only, needs code) and AWS EventBridge Scheduler (documented 60 s precision, but needs a Lambda and a paid-plan account). Moving the app off GitHub Actions wasn't worth a container image and a billing account.
 
 Both use `contents: read`, `persist-credentials: false`, a 10-minute timeout, and Temurin 27 with the Maven cache.
 
@@ -97,6 +100,5 @@ Both use `contents: read`, `persist-credentials: false`, a 10-minute timeout, an
 
 Not built; ideas only.
 
-- A keep-alive workflow, since GitHub disables scheduled workflows on public repositories after 60 days without activity (see [known limits](product.md#known-limits)).
-- A move to Cloud Scheduler plus a Cloud Run Job, if GitHub's schedule proves unreliable.
+- A Cloudflare Workers cron trigger instead of cron-job.org, if the token should live in an encrypted secret store or cron-job.org proves unreliable.
 - A softer emoji when the rain chance is low.

@@ -1,9 +1,9 @@
 name: Morning Bro
 
+# Started daily at 07:50 Europe/Athens by an external cron-job.org job that calls
+# the workflow_dispatch API with dry_run=false. GitHub's own `schedule` event was
+# dropped: it created runs 7-8 hours late. See docs/architecture.md#scheduling.
 on:
-  schedule:
-    - cron: '50 7 * * *'
-      timezone: "Europe/Athens"
   workflow_dispatch:
     inputs:
       dry_run:
