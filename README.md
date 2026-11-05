@@ -5,9 +5,9 @@
 ![Spring Boot 4.1](https://img.shields.io/badge/Spring%20Boot-4.1-6db33f)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-A good-morning bot for a group of friends who live in different places. Every morning it posts one message to a Discord channel: a greeting, plus a quick look at the weather wherever each of you is. You pick the places, the greeting and the time zone.
+A daily good-morning post for a group of friends who live in different places. Every morning it sends one message to a Discord channel through a webhook: a greeting, plus a quick look at the weather wherever each of you is. You pick the places, the greeting and the time zone.
 
-<img src="docs/images/message.png" alt="Example Morning Bro message in Discord: a greeting, then four locations, each with a flag, place name, weather emoji, low–high temperature and rain chance" width="380">
+<img src="docs/images/message.png" alt="Example Morning Bro message in Discord, posted under the Morning Bro name and avatar: a greeting, then four locations, each with a flag, place name, weather emoji, low–high temperature and rain chance" width="335">
 
 <sub>An example message with four locations.</sub>
 
@@ -88,7 +88,7 @@ Validation rules: see [docs/architecture.md](docs/architecture.md#configuration-
 
 To run your own copy every day, fork the repo first, so the workflow and its secret live in your fork.
 
-1. Create a webhook: Discord channel, *Edit Channel*, *Integrations*, *Webhooks*, *New Webhook*, *Copy Webhook URL*. It looks like `https://discord.com/api/webhooks/<id>/<token>`. Treat the URL as a password.
+1. Create a webhook: Discord channel, *Edit Channel*, *Integrations*, *Webhooks*, *New Webhook*, *Copy Webhook URL*. It looks like `https://discord.com/api/webhooks/<id>/<token>`. Treat the URL as a password. Give the webhook a name and avatar: that is who the message appears to come from.
 2. Locally: `cp .env.example .env`, fill in `MORNING_BRO_DISCORD_WEBHOOK_URL`, then `./mvnw spring-boot:run`. `.env` is gitignored, and real environment variables override it.
 3. On GitHub (in your fork): `gh secret set MORNING_BRO_DISCORD_WEBHOOK_URL` (it prompts for the value, so the URL never lands in your shell history).
 4. Run it every morning: set up the daily trigger described in [docs/operations.md](docs/operations.md).
