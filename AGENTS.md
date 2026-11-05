@@ -16,6 +16,7 @@ Read the relevant doc before changing code, and update it when behavior changes.
 - [README.md](README.md): setup, configuration, running and operating it.
 - [docs/product.md](docs/product.md): what it does and the message rules.
 - [docs/architecture.md](docs/architecture.md): packages, failure handling, scheduling, testing and design decisions.
+- [docs/operations.md](docs/operations.md): the daily cron-job.org trigger, its GitHub token, and day-to-day `gh` commands.
 
 ## Git and GitHub
 
