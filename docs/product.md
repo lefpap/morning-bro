@@ -1,6 +1,6 @@
 # Morning Bro
 
-Morning Bro is a small daily ritual for a group of friends. Around 07:50 Athens time it posts one message in their Discord channel: a greeting plus a quick weather check for each friend's location, so everyone can decide on a jacket or an umbrella. It should feel like a friend posting, not a dashboard.
+Morning Bro is a small daily ritual for a group of friends. Every morning it posts one message in their Discord channel: a greeting plus a quick weather check for each friend's location, so everyone can decide on a jacket or an umbrella. It should feel like a friend posting, not a dashboard.
 
 ## The message
 
