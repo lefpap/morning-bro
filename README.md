@@ -22,7 +22,7 @@ Good Morning — Καλημέρα! ☕⛅ Take it easy Friday! 😎
 
 ## How it works
 
-At 07:50 Europe/Athens a [cron-job.org](https://cron-job.org) job starts the GitHub Actions workflow, which runs the app. It fetches each location's forecast from Open-Meteo and posts one message to a Discord webhook. Then it exits. See the [architecture overview](docs/architecture.md#overview).
+Every morning (Europe/Athens time) a [cron-job.org](https://cron-job.org) job starts the GitHub Actions workflow, which runs the app. It fetches each location's forecast from Open-Meteo and posts one message to a Discord webhook. Then it exits. See the [architecture overview](docs/architecture.md#overview).
 
 ## Requirements
 
@@ -104,7 +104,7 @@ Tests never touch the network and never start the job on application startup. CI
 
 ## Operating it
 
-- Schedule: daily at 07:50 Europe/Athens, triggered by cron-job.org (see [Daily trigger](#daily-trigger-cron-joborg) and [scheduling](docs/architecture.md#scheduling)).
+- Schedule: every morning (Europe/Athens time), triggered by cron-job.org (see [Daily trigger](#daily-trigger-cron-joborg) and [scheduling](docs/architecture.md#scheduling)).
 - Manual dry run: `gh workflow run morning-bro.yml`
 - Manual real post (e.g. a re-send after an outage): `gh workflow run morning-bro.yml -f dry_run=false`
 - Watch and inspect: `gh run list --workflow morning-bro.yml`, `gh run watch`, `gh run view <run-id> --log`
@@ -118,7 +118,7 @@ A free [cron-job.org](https://cron-job.org) job calls GitHub's [workflow dispatc
 | Setting | Value |
 |---|---|
 | URL | `https://api.github.com/repos/lefpap/morning-bro/actions/workflows/morning-bro.yml/dispatches` |
-| Schedule | Every day at 07:50, time zone `Europe/Athens` (follows daylight saving time) |
+| Schedule | Every day in the morning, time zone `Europe/Athens` (follows daylight saving time) |
 | Method | `POST` |
 | Headers | `Authorization: Bearer <token>`, `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`, `Content-Type: application/json` |
 | Body | `{"ref":"master","inputs":{"dry_run":"false"}}` |
