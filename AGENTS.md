@@ -4,7 +4,7 @@ Guidance for AI coding agents working on Morning Bro.
 
 ## Project
 
-A run-once Spring Boot app (Java 27, Maven wrapper) that posts a daily "good morning" and per-location weather summary to Discord, scheduled by GitHub Actions.
+A run-once Spring Boot app (Java 27, Maven wrapper) that posts a daily "good morning" and per-location weather summary to Discord, run on GitHub Actions and triggered daily by a cron-job.org job.
 
 - Build and test: `./mvnw test`
 - Local dry run (logs the message, posts nothing): `MORNING_BRO_DRY_RUN=true ./mvnw spring-boot:run`
