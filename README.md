@@ -7,7 +7,7 @@
 
 A daily good-morning post for a group of friends who live in different places. Every morning it sends one message to a Discord channel through a webhook: a greeting, plus a quick look at the weather wherever each of you is. You pick the places, the greeting and the time zone.
 
-<img src="docs/images/message.png" alt="Example Morning Bro message in Discord, posted under the Morning Bro name and avatar: a greeting, then four locations, each with a flag, place name, weather emoji, low–high temperature and rain chance" width="335">
+<img src="docs/images/message.png" alt="Example Morning Bro message in Discord, posted under the Morning Bro name and avatar: a greeting, then four locations, each with a flag, place name, weather emoji, low–high temperature and rain chance, then a small grey Weather data by Open-Meteo.com credit" width="482">
 
 <sub>An example message with four locations.</sub>
 
