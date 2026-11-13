@@ -78,7 +78,7 @@ Both use `contents: read`, `persist-credentials: false`, a 10-minute timeout, an
 
 `./mvnw test` never hits the network (`MockRestServiceServer`, with closed local ports as a backstop) and never starts the job on application startup (`morning-bro.run-on-startup=false`). Fixed UTC clocks prove the zone logic.
 
-- `MorningBroPropertiesTest`: every validation rule.
+- `MorningBroPropertiesTest`: the project's own config rules (home must name a location, location names are unique). The standard constraint annotations aren't re-tested.
 - `OpenMeteoClientTest`, `DiscordWebhookClientTest`: request shape, error mapping, no URL leaks.
 - `ForecastConverterTest`, `WeatherEmojiTest`, `WeatherServiceTest`: conversion, rounding, emoji, zone.
 - `MorningMessageComposerTest`, `CountryFlagTest`: message layout and flags.
