@@ -9,6 +9,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,12 +26,14 @@ public class MorningMessageComposer {
     private final MorningBroProperties properties;
 
     /**
-     * The full message for today: a greeting, then one block per location in the given order.
+     * The full message for today: a greeting, one block per location in the given order, then the weather data credit.
      */
     public String compose(LocalDate today, List<LocationWeather> weather) {
         Stream<String> blocks = weather.stream().map(MorningMessageComposer::locationBlock);
         String header = header(today, weather);
-        return Stream.concat(Stream.of(header), blocks)
+        String attribution = properties.message().attribution();
+        return Stream.of(Stream.of(header), blocks, Stream.of(attribution))
+            .flatMap(Function.identity())
             .collect(Collectors.joining(BLOCK_SEPARATOR));
     }
 

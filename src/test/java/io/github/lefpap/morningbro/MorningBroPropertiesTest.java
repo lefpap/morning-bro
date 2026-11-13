@@ -20,6 +20,7 @@ class MorningBroPropertiesTest {
         "morning-bro.home=Athens",
         "morning-bro.message.morning=Good Morning",
         "morning-bro.message.friday=Take it easy Friday!",
+        "morning-bro.message.attribution=-# Weather by Open-Meteo",
         "morning-bro.locations[0].name=Athens",
         "morning-bro.locations[0].country-code=GR",
         "morning-bro.locations[0].latitude=37.98",
@@ -45,7 +46,7 @@ class MorningBroPropertiesTest {
                 MorningBroProperties properties = context.getBean(MorningBroProperties.class);
                 assertThat(properties.timeZone()).isEqualTo(ZoneId.of("Europe/Athens"));
                 assertThat(properties.home()).isEqualTo("Athens");
-                assertThat(properties.message()).isEqualTo(new MorningBroProperties.Message("Good Morning", "Take it easy Friday!"));
+                assertThat(properties.message()).isEqualTo(new MorningBroProperties.Message("Good Morning", "Take it easy Friday!", "-# Weather by Open-Meteo"));
                 assertThat(properties.locations()).containsExactly(
                     new MorningBroProperties.Location("Athens", "GR", 37.98, 23.73),
                     new MorningBroProperties.Location("Brussels", "BE", 50.85, 4.35));
@@ -66,6 +67,7 @@ class MorningBroPropertiesTest {
         "morning-bro.home, home",
         "morning-bro.message.morning, message.morning",
         "morning-bro.message.friday, message.friday",
+        "morning-bro.message.attribution, message.attribution",
         "morning-bro.locations[0].name, locations[0].name",
         "morning-bro.locations[0].country-code, locations[0].countryCode",
         "morning-bro.locations[0].latitude, locations[0].latitude",
@@ -101,7 +103,7 @@ class MorningBroPropertiesTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"morning", "friday"})
+    @ValueSource(strings = {"morning", "friday", "attribution"})
     void blankMessageFailsStartup(String key) {
         runner.withPropertyValues(VALID_PROPERTIES)
             .withPropertyValues("morning-bro.message." + key + "= ")

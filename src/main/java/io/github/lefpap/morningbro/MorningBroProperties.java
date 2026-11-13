@@ -27,11 +27,12 @@ public record MorningBroProperties(
         boolean dryRun) {
 
     /**
-     * The greeting texts.
+     * The message texts: the greeting, the Friday addition, and the weather data credit that ends every message.
      */
     public record Message(
             @NotBlank String morning,
-            @NotBlank String friday) {
+            @NotBlank String friday,
+            @NotBlank String attribution) {
     }
 
     /**
