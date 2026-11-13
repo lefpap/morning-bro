@@ -48,7 +48,7 @@ It's a run-once app: it starts, fetches each location's forecast, builds the mes
 
 ## Make it yours
 
-The places, the greeting, the Friday line and the time zone are all in `src/main/resources/application.yaml`. To add a location:
+The places, the greeting, the Friday line, the weather credit and the time zone are all in `src/main/resources/application.yaml`. To add a location:
 
 ```yaml
 morning-bro:
@@ -74,6 +74,7 @@ Everything except run-on-startup lives in `src/main/resources/application.yaml`.
 | `morning-bro.home` | Name of the location whose weather emoji goes in the header | `Athens` | – |
 | `morning-bro.message.morning` | The greeting | `Good Morning — Καλημέρα! ☕` | – |
 | `morning-bro.message.friday` | Added to the header on Fridays | `Take it easy Friday! 😎` | – |
+| `morning-bro.message.attribution` | The weather data credit that ends every message, posted as written (Open-Meteo's licence asks for it) | `-# Weather data by [Open-Meteo.com](<https://open-meteo.com/>)` | – |
 | `morning-bro.locations[]` | Locations to report on, in order: `name`, `country-code`, `latitude`, `longitude` | Athens, Ikaria, Brussels, Milan | – |
 | `morning-bro.dry-run` | Log the message instead of posting it | `false` | `MORNING_BRO_DRY_RUN` |
 | `morning-bro.run-on-startup` | Run the job as soon as the app starts (tests set it to `false`) | `true` (not in the yaml) | – |

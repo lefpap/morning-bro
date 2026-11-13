@@ -27,10 +27,12 @@ class MorningMessageComposerTest {
     private static final Forecast BRUSSELS_FORECAST = new Forecast("🌦️", 6, 11, 60);
     private static final Forecast MILAN_FORECAST = new Forecast("🌧️", 9, 14, 80);
 
+    private static final String ATTRIBUTION = "-# Weather data by [Open-Meteo.com](<https://open-meteo.com/>)";
+
     private static final MorningBroProperties PROPERTIES = new MorningBroProperties(
         ZoneId.of("Europe/Athens"),
         "Athens",
-        new MorningBroProperties.Message("Good Morning — Καλημέρα! ☕", "Take it easy Friday! 😎"),
+        new MorningBroProperties.Message("Good Morning — Καλημέρα! ☕", "Take it easy Friday! 😎", ATTRIBUTION),
         List.of(ATHENS, IKARIA, BRUSSELS, MILAN), false);
 
     private static final String LOCATION_BLOCKS = """
@@ -53,7 +55,7 @@ class MorningMessageComposerTest {
         assertThat(composer.compose(THURSDAY, allPresent())).isEqualTo("""
             Good Morning — Καλημέρα! ☕⛅
 
-            """ + LOCATION_BLOCKS);
+            """ + LOCATION_BLOCKS + "\n\n" + ATTRIBUTION);
     }
 
     @Test
@@ -61,7 +63,7 @@ class MorningMessageComposerTest {
         assertThat(composer.compose(FRIDAY, allPresent())).isEqualTo("""
             Good Morning — Καλημέρα! ☕⛅ Take it easy Friday! 😎
 
-            """ + LOCATION_BLOCKS);
+            """ + LOCATION_BLOCKS + "\n\n" + ATTRIBUTION);
     }
 
     @Test
@@ -108,7 +110,9 @@ class MorningMessageComposerTest {
             (weather is taking the day off)
 
             🇮🇹 Milan
-            (weather is taking the day off)""");
+            (weather is taking the day off)
+
+            -# Weather data by [Open-Meteo.com](<https://open-meteo.com/>)""");
     }
 
     @Test
@@ -124,27 +128,29 @@ class MorningMessageComposerTest {
             🌦️ · 6°–11° · 💧 60%
 
             🇬🇷 Athens
-            ⛅ · 15°–21° · 💧 25%""");
+            ⛅ · 15°–21° · 💧 25%
+
+            -# Weather data by [Open-Meteo.com](<https://open-meteo.com/>)""");
     }
 
     @Test
     void negativeAndZeroValues() {
         assertThat(composer.compose(THURSDAY, List.of(present(BRUSSELS, new Forecast("🌨️", -4, 2, 0)))))
-            .endsWith("\n🌨️ · -4°–2° · 💧 0%");
+            .contains("\n🌨️ · -4°–2° · 💧 0%\n");
         assertThat(composer.compose(THURSDAY, List.of(present(BRUSSELS, new Forecast("☁️", -1, 0, 5)))))
-            .endsWith("\n☁️ · -1°–0° · 💧 5%");
+            .contains("\n☁️ · -1°–0° · 💧 5%\n");
     }
 
     @Test
     void singleLocation() {
         assertThat(composer.compose(THURSDAY, List.of(present(ATHENS, ATHENS_FORECAST))))
-            .isEqualTo("Good Morning — Καλημέρα! ☕⛅\n\n🇬🇷 Athens\n⛅ · 15°–21° · 💧 25%");
+            .isEqualTo("Good Morning — Καλημέρα! ☕⛅\n\n🇬🇷 Athens\n⛅ · 15°–21° · 💧 25%\n\n" + ATTRIBUTION);
     }
 
     // The text blocks above could hide look-alikes (hyphen for en dash, bullet for middle dot); escapes can't.
     @Test
     void separatorsAreExactCodePoints() {
-        String weatherLine = composer.compose(THURSDAY, List.of(present(ATHENS, ATHENS_FORECAST))).lines().toList().getLast();
+        String weatherLine = composer.compose(THURSDAY, List.of(present(ATHENS, ATHENS_FORECAST))).lines().toList().get(3);
 
         assertThat(weatherLine).isEqualTo("\u26C5 \u00B7 15\u00B0\u201321\u00B0 \u00B7 \uD83D\uDCA7 25%");
     }

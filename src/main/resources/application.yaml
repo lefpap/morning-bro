@@ -32,6 +32,8 @@ morning-bro:
   message:
     morning: "Good Morning — Καλημέρα! ☕"
     friday: "Take it easy Friday! 😎"
+    # Open-Meteo's CC BY 4.0 credit, as Discord small text; <...> stops the link preview.
+    attribution: "-# Weather data by [Open-Meteo.com](<https://open-meteo.com/>)"
   locations:
     - name: Athens
       country-code: GR

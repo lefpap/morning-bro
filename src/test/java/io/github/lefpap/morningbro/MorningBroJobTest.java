@@ -190,10 +190,16 @@ class MorningBroJobTest {
     }
 
     private static MorningBroProperties properties(boolean dryRun) {
+        MorningBroProperties.Message message = new MorningBroProperties.Message(
+            "Good Morning",
+            "Take it easy Friday!",
+            "-# Weather by Open-Meteo"
+        );
+
         return new MorningBroProperties(
             ZoneId.of("Europe/Athens"),
             "Athens",
-            new MorningBroProperties.Message("Good Morning", "Take it easy Friday!"),
+            message,
             List.of(ATHENS, BRUSSELS, MILAN),
             dryRun);
     }

@@ -18,6 +18,8 @@ Good Morning — Καλημέρα! ☕⛅ Take it easy Friday! 😎
 
 🇮🇹 Milan
 (weather is taking the day off)
+
+-# Weather data by [Open-Meteo.com](<https://open-meteo.com/>)
 ```
 
 The rules:
@@ -27,6 +29,7 @@ The rules:
 - Temperatures are in °C, rounded half-up. Rain is the day's highest precipitation probability.
 - If a location's weather can't be fetched, its block shows `(weather is taking the day off)` instead of the weather line.
 - If the home location's weather fails, the header simply has no emoji.
+- The message always ends, after a blank line, with the weather data credit, even if all the weather fails. Open-Meteo's CC BY 4.0 licence asks for it. It is configured text, posted as written; the default uses Discord's small text (`-#`) and wraps the link in `<...>` so Discord shows no link preview.
 - "Today" and "Friday" are decided in the configured time zone (Europe/Athens by default), not UTC.
 
 ## Weather emoji
@@ -72,4 +75,4 @@ Accepted quirk: the daily code is the day's most severe condition, so a line lik
 
 ## Changing it
 
-Adding a location or changing the greeting is a config edit in `src/main/resources/application.yaml`. See the [README's configuration section](../README.md#configuration) for the keys.
+Adding a location or changing the greeting or the credit is a config edit in `src/main/resources/application.yaml`. See the [README's configuration section](../README.md#configuration) for the keys.
